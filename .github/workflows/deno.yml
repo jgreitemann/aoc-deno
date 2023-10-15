@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: ["main"]
 
+env:
+  DENO_DIR: .deno-cached-deps
+
 permissions:
   contents: read
 
@@ -27,6 +30,12 @@ jobs:
 
       - name: Run linter
         run: deno lint
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
       - name: Run tests
         run: deno test -A
