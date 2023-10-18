@@ -1,6 +1,7 @@
 {
   "version": "3",
   "redirects": {
+    "https://deno.land/x/uuid/mod.ts": "https://deno.land/x/uuid@v0.1.2/mod.ts",
     "https://esm.sh/v132/@types/lodash@4.14.199/index": "https://esm.sh/v132/@types/lodash@4.14.199/index~.d.ts",
     "https://esm.sh/v132/@types/lodash@^4/index.d.ts": "https://esm.sh/v132/@types/lodash@4.14.199/index.d.ts"
   },
@@ -36,6 +37,8 @@
     "https://deno.land/std@0.201.0/assert/mod.ts": "37c49a26aae2b254bbe25723434dc28cd7532e444cf0b481a97c045d110ec085",
     "https://deno.land/std@0.201.0/assert/unimplemented.ts": "d56fbeecb1f108331a380f72e3e010a1f161baa6956fd0f7cf3e095ae1a4c75a",
     "https://deno.land/std@0.201.0/assert/unreachable.ts": "4600dc0baf7d9c15a7f7d234f00c23bca8f3eba8b140286aaca7aa998cf9a536",
-    "https://deno.land/std@0.201.0/fmt/colors.ts": "87544aa2bc91087bb37f9c077970c85bfb041b48e4c37356129d7b450a415b6f"
+    "https://deno.land/std@0.201.0/fmt/colors.ts": "87544aa2bc91087bb37f9c077970c85bfb041b48e4c37356129d7b450a415b6f",
+    "https://deno.land/x/uuid@v0.1.2/mod.ts": "efc48233163b385262e5ec79662ad76f7684ad80080fc69a140c6e01e56c75d8",
+    "https://deno.land/x/uuid@v0.1.2/v4.ts": "00392ef1efb815545d6b0ec5fb0260d4ed4295259abc3162766e397c47226a7b"
   }
 }

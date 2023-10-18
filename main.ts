@@ -1,3 +1,5 @@
+import { cachingFetch } from "./cache.ts";
+
 interface Solution<T> {
   parse(input: string): T;
   part1?(data: T): string;
@@ -18,13 +20,12 @@ async function run() {
   const solution = await import("./2016/day01.ts");
   const session = Deno.env.get("SESSION")!;
 
-  const headers = {
-    Cookie: `session=${session}`,
-  };
+  const request = new Request("https://adventofcode.com/2016/day/1/input");
+  request.headers.append("Cookie", `session=${session}`);
 
-  const inputResponse = await fetch(
-    "https://adventofcode.com/2016/day/1/input",
-    { headers },
+  const inputResponse = await cachingFetch(
+    request,
+    `aoc-input-session-${session}`,
   );
 
   const input = await inputResponse.text();
