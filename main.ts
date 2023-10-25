@@ -1,36 +1,59 @@
 import { cachingFetch } from "./cache.ts";
-
-interface Solution<T> {
-  parse(input: string): T;
-  part1?(data: T): string;
-  part2?(data: T): string;
-}
+import { Solution } from "./solution.ts";
 
 function solve<T>(solution: Solution<T>, input: string) {
   const data = solution.parse(input);
   if (solution.part1) {
-    console.log("Part 1: " + solution.part1(data));
+    console.log(
+      "%cPart 1: %c" + solution.part1(data),
+      "color: gray",
+      "color: white; font-weight: bold",
+    );
   }
   if (solution.part2) {
-    console.log("Part 2: " + solution.part2(data));
+    console.log(
+      "%cPart 2: %c" + solution.part2(data),
+      "color: gray",
+      "color: white; font-weight: bold",
+    );
   }
 }
 
 async function run() {
-  const solution = await import("./2016/day01.ts");
   const session = Deno.env.get("SESSION")!;
 
-  const request = new Request("https://adventofcode.com/2016/day/1/input");
-  request.headers.append("Cookie", `session=${session}`);
+  for await (const yearEntry of Deno.readDir(".")) {
+    if (!yearEntry.isDirectory || !yearEntry.name.startsWith("20")) {
+      continue;
+    }
+    const year = yearEntry.name;
+    for await (const dayEntry of Deno.readDir("./" + year)) {
+      const dayMatch = dayEntry.name.match(/day0*([1-9][0-9]*)\.ts/);
+      if (dayEntry.isFile && dayMatch !== null) {
+        const day = dayMatch[1];
+        const { default: solution } = await import(
+          `./${yearEntry.name}/${dayEntry.name}`
+        );
 
-  const inputResponse = await cachingFetch(
-    request,
-    `aoc-input-session-${session}`,
-  );
+        const request = new Request(
+          `https://adventofcode.com/${year}/day/${day}/input`,
+        );
+        request.headers.append("Cookie", `session=${session}`);
 
-  const input = await inputResponse.text();
+        const inputResponse = await cachingFetch(
+          request,
+          `aoc-input-session-${session}`,
+        );
 
-  solve(solution, input);
+        const input = await inputResponse.text();
+
+        console.log(`%cDay ${day}, ${year}`, "color: yellow");
+        console.group();
+        solve(solution, input);
+        console.groupEnd();
+      }
+    }
+  }
 }
 
 if (import.meta.main) {

@@ -1,6 +1,33 @@
+import { Solution } from "../solution.ts";
 import "../utils/iter.ts";
 import { Iter } from "../utils/iter.ts";
 import { Vector, vectorCompare } from "../utils/vec.ts";
+
+export default <Solution<Instruction[]>> {
+  parse(input: string): Instruction[] {
+    return input
+      .split(", ")
+      .flatMap(([direction, ...digits]): [Rotate, Translate] => [
+        { kind: "rotate", direction: toDirection(direction) },
+        { kind: "translate", distance: +digits.join("") },
+      ]);
+  },
+
+  part1(instructions: Instruction[]): string {
+    const end = instructions
+      .iter()
+      .fold(move, INITIAL);
+    return normL1(end.position).toString();
+  },
+
+  part2(instructions: Instruction[]): string {
+    const hq = intersectionPoints(instructions).first();
+    if (hq === undefined) {
+      throw new Error("Path does not intersect with itself");
+    }
+    return normL1(hq).toString();
+  },
+};
 
 export enum Direction {
   L,
@@ -24,34 +51,10 @@ type State = {
   position: Vector<2>;
 };
 
-export function parse(input: string): Instruction[] {
-  return input
-    .split(", ")
-    .flatMap(([direction, ...digits]): [Rotate, Translate] => [
-      { kind: "rotate", direction: toDirection(direction) },
-      { kind: "translate", distance: +digits.join("") },
-    ]);
-}
-
 export const INITIAL: State = {
   orientation: [0, 1],
   position: [0, 0],
 };
-
-export function part1(instructions: Instruction[]): string {
-  const end = instructions
-    .iter()
-    .fold(move, INITIAL);
-  return normL1(end.position).toString();
-}
-
-export function part2(instructions: Instruction[]): string {
-  const hq = intersectionPoints(instructions).first();
-  if (hq === undefined) {
-    throw new Error("Path does not intersect with itself");
-  }
-  return normL1(hq).toString();
-}
 
 function toDirection(dir: string): Direction {
   if (dir in Direction) {

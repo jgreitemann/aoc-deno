@@ -1,12 +1,10 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/assert_equals.ts";
-import {
+import soln, {
   Direction,
   INITIAL,
   Instruction,
   intersectionPoints,
   move,
-  parse,
-  part1,
   stepWise,
 } from "./day01.ts";
 
@@ -69,9 +67,9 @@ Deno.test("`move` carries out translation instructions", () => {
 });
 
 Deno.test("Part 1 examples", () => {
-  assertEquals(part1(parse("R2, L3")), "5");
-  assertEquals(part1(parse("R2, R2, R2")), "2");
-  assertEquals(part1(parse("R5, L5, R5, R3")), "12");
+  assertEquals(soln.part1?.(soln.parse("R2, L3")), "5");
+  assertEquals(soln.part1?.(soln.parse("R2, R2, R2")), "2");
+  assertEquals(soln.part1?.(soln.parse("R5, L5, R5, R3")), "12");
 });
 
 Deno.test("`stepwise` leaves rotation instructions unaltered", () => {
@@ -143,7 +141,7 @@ Deno.test("`stepWise` does not mutate the input translation instruction", () => 
 
 Deno.test("`flatMap(stepWise)` produces the intended sequence of instructions", () => {
   assertEquals(
-    [...parse("R3").iter().flatMap(stepWise)],
+    [...soln.parse("R3").iter().flatMap(stepWise)],
     [
       {
         kind: "rotate",
@@ -166,7 +164,7 @@ Deno.test("`flatMap(stepWise)` produces the intended sequence of instructions", 
 });
 
 Deno.test("Final position is the same, with or without applying `stepWise`", () => {
-  const instructions = parse("R8, R4, R4, R8");
+  const instructions = soln.parse("R8, R4, R4, R8");
   assertEquals(
     instructions.iter().flatMap(stepWise).fold(move, INITIAL),
     instructions.iter().fold(move, INITIAL),
@@ -175,7 +173,7 @@ Deno.test("Final position is the same, with or without applying `stepWise`", () 
 
 Deno.test("Part 2 example intersection point is found", () => {
   assertEquals(
-    [...intersectionPoints(parse("R8, R4, R4, R8"))],
+    [...intersectionPoints(soln.parse("R8, R4, R4, R8"))],
     [[4, 0]],
   );
 });
