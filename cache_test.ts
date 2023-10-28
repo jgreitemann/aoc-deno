@@ -15,7 +15,16 @@ class UUIDServer {
     this.#abortController = new AbortController();
     this.#server = Deno.serve(
       { ...opts, signal: this.#abortController.signal },
-      () => new Response(uuid()),
+      (req) =>
+        new Response(
+          uuid(),
+          req.url.includes("cake")
+            ? {
+              status: 404,
+              statusText: "The cake is a lie",
+            }
+            : undefined,
+        ),
     );
   }
 
@@ -100,6 +109,29 @@ Deno.test("`cachingFetch` retrieves different UUIDs from the test server when di
   assertNotEquals(
     await cachingFetchBody(`test-cache-${uuid()}`),
     await cachingFetchBody(`test-cache-${uuid()}`),
+  );
+
+  await server.shutdown();
+});
+
+Deno.test("`catchingFetch` retrieves different UUIDs from the test server when response status is not OK", async () => {
+  const cacheName = `test-cache-${uuid()}`;
+  const server = new UUIDServer({ port: 8444 });
+
+  async function cachingFetchBody(
+    cacheName: string,
+  ): Promise<string> {
+    const response = await cachingFetch(
+      new Request("http://localhost:8444/cake"),
+      cacheName,
+    );
+    assertNotEquals(response.status, 200);
+    return await response.text();
+  }
+
+  assertNotEquals(
+    await cachingFetchBody(cacheName),
+    await cachingFetchBody(cacheName),
   );
 
   await server.shutdown();

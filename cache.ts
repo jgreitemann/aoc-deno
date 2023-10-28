@@ -9,6 +9,10 @@ export async function cachingFetch(
   }
 
   const response = await fetch(req);
-  await cache.put(req, response);
-  return (await cache.match(req))!;
+  if (response.status === 200) {
+    await cache.put(req, response);
+    return (await cache.match(req))!;
+  } else {
+    return Promise.resolve(response);
+  }
 }

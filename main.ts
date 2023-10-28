@@ -21,6 +21,9 @@ function solve<T>(solution: Solution<T>, input: string) {
 
 async function run() {
   const session = Deno.env.get("SESSION")!;
+  const cacheName = `aoc-input-session-${session}`;
+
+  // console.log("Disabled cache: ", await caches.delete(cacheName));
 
   for await (const yearEntry of Deno.readDir(".")) {
     if (!yearEntry.isDirectory || !yearEntry.name.startsWith("20")) {
@@ -42,7 +45,7 @@ async function run() {
 
         const inputResponse = await cachingFetch(
           request,
-          `aoc-input-session-${session}`,
+          cacheName,
         );
 
         const input = await inputResponse.text();
