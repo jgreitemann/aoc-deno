@@ -48,6 +48,16 @@ async function run() {
           cacheName,
         );
 
+        if (inputResponse.status !== 200) {
+          const message = await inputResponse.text();
+          console.error(
+            `%cFailed to download puzzle input for day ${day}, ${year}: ${inputResponse.statusText}\n%c${message}`,
+            "color: red; text-weight: bold",
+            "color: white",
+          );
+          return;
+        }
+
         const input = await inputResponse.text();
 
         console.log(`%cDay ${day}, ${year}`, "color: yellow");
