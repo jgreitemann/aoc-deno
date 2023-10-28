@@ -60,9 +60,8 @@ async function run() {
 
         const input = await inputResponse.text();
 
-        console.log(`%cDay ${day}, ${year}`, "color: yellow");
-        console.group();
-        solve(solution, input);
+        console.group(`%cDay ${day}, ${year}`, "color: yellow");
+        solve(solution, input.trim());
         console.groupEnd();
       }
     }
