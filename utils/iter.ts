@@ -15,6 +15,10 @@ export class Iter<T> implements Iterable<T> {
     return this.it[Symbol.iterator]();
   }
 
+  collect(): T[] {
+    return [...this.it];
+  }
+
   reduce(callback: (acc: T, elem: T) => T): T | undefined {
     let acc = undefined;
     for (const elem of this.it) {
