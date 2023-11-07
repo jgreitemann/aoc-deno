@@ -152,3 +152,27 @@ export class Iter<T> implements Iterable<T> {
 export function strictEqualityCompare<T>(lhs: T, rhs: T): boolean {
   return lhs === rhs;
 }
+
+type Zip<A extends ReadonlyArray<Iterable<unknown>>> = {
+  [K in keyof A]: A[K] extends Iterable<infer T> ? T : never;
+};
+
+export function zip<Args extends ReadonlyArray<Iterable<unknown>>>(
+  ...args: Args
+): Iter<Zip<Args>> {
+  return new Iter(
+    function* (args: Args): Generator<Zip<Args>> {
+      const iters = args.map((iterable) => iterable[Symbol.iterator]());
+      while (true) {
+        const values = [
+          ...iters.iter().map((it) => it.next()).filterMap((res) =>
+            !res.done ? res.value : undefined
+          ),
+        ];
+        if (values.length === args.length) {
+          yield values as Zip<Args>;
+        } else break;
+      }
+    }(args),
+  );
+}

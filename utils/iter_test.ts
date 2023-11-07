@@ -1,5 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
 import "./iter.ts";
+import { zip } from "./iter.ts";
 
 const primes = [2, 3, 5, 7, 11, 13];
 const sum = (acc: number, elem: number) => acc + elem;
@@ -285,5 +286,62 @@ Deno.test("Iter.dedup can be used with a custom comparator", () => {
   assertEquals(
     [a, a, b, c].iter().dedup((lhs, rhs) => lhs.value === rhs.value).collect(),
     [a, b],
+  );
+});
+
+Deno.test("Zipping two arrays of the same length", () => {
+  assertEquals(
+    zip(
+      [1, 2, 3],
+      [4, 5, 6],
+    ).collect(),
+    [[1, 4], [2, 5], [3, 6]],
+  );
+});
+
+Deno.test("Zipping two arrays of different lengths", () => {
+  assertEquals(
+    zip(
+      [1, 2],
+      [4, 5, 6],
+    ).collect(),
+    [[1, 4], [2, 5]],
+  );
+  assertEquals(
+    zip(
+      [1, 2, 3],
+      [4, 5],
+    ).collect(),
+    [[1, 4], [2, 5]],
+  );
+});
+
+Deno.test("Zipping multiple iterators over different types", () => {
+  const names_tuple = ["Fred", "Josh", "Ben"] as const;
+  const ages = [42, 19, 23];
+  const height = function* () {
+    yield 1.82;
+    yield 1.79;
+    yield 1.84;
+  }();
+  assertEquals(
+    zip(names_tuple, ages, height).collect(),
+    [
+      ["Fred" as const, 42 as const, 1.82 as const],
+      ["Josh" as const, 19 as const, 1.79 as const],
+      ["Ben" as const, 23 as const, 1.84 as const],
+    ],
+  );
+});
+
+Deno.test("Zipping a dynamic array of iterators", () => {
+  const args = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+  ];
+  assertEquals(
+    zip(...args).collect(),
+    [[1, 4, 7], [2, 5, 8], [3, 6, 9]],
   );
 });
