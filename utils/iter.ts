@@ -5,23 +5,27 @@ declare global {
 }
 
 Object.prototype.iter = function <T>(this: Iterable<T>) {
-  return new Iter(this);
+  return new Iter(this[Symbol.iterator]());
 };
 
-export class Iter<T> implements Iterable<T> {
-  constructor(private it: Iterable<T>) {}
+export class Iter<T> implements Iterator<T>, Iterable<T> {
+  constructor(private it: Iterator<T>) {}
 
   [Symbol.iterator](): Iterator<T> {
-    return this.it[Symbol.iterator]();
+    return this;
+  }
+
+  next(): IteratorResult<T> {
+    return this.it.next();
   }
 
   collect(): T[] {
-    return [...this.it];
+    return [...this];
   }
 
   reduce(callback: (acc: T, elem: T) => T): T | undefined {
     let acc = undefined;
-    for (const elem of this.it) {
+    for (const elem of this) {
       acc = acc === undefined ? elem : callback(acc, elem);
     }
     return acc;
@@ -29,7 +33,7 @@ export class Iter<T> implements Iterable<T> {
 
   fold<U>(callback: (acc: U, elem: T) => U, initial: U): U {
     let acc = initial;
-    for (const elem of this.it) {
+    for (const elem of this) {
       acc = callback(acc, elem);
     }
     return acc;
@@ -47,7 +51,7 @@ export class Iter<T> implements Iterable<T> {
           yield state;
         }
       }
-    }(this.it));
+    }(this));
   }
 
   flatten<U>(this: Iter<Iterable<U>>): Iter<U> {
@@ -56,7 +60,7 @@ export class Iter<T> implements Iterable<T> {
         for (const nestedIt of it) {
           yield* nestedIt;
         }
-      }(this.it),
+      }(this),
     );
   }
 
@@ -65,7 +69,7 @@ export class Iter<T> implements Iterable<T> {
       for (const elem of it) {
         yield callback(elem);
       }
-    }(this.it));
+    }(this));
   }
 
   flatMap<U>(callback: (elem: T) => Iterable<U>): Iter<U> {
@@ -79,7 +83,7 @@ export class Iter<T> implements Iterable<T> {
           yield elem;
         }
       }
-    }(this.it));
+    }(this));
   }
 
   filterMap<U>(callback: (elem: T) => U | undefined): Iter<U> {
@@ -90,17 +94,17 @@ export class Iter<T> implements Iterable<T> {
           yield mapped;
         }
       }
-    }(this.it));
+    }(this));
   }
 
   first(): T | undefined {
-    const result = this.it[Symbol.iterator]().next();
+    const result = this.next();
     return !(result.done) ? result.value : undefined;
   }
 
   last(): T | undefined {
     let last: T | undefined = undefined;
-    for (const elem of this.it) {
+    for (const elem of this) {
       last = elem;
     }
     return last;
@@ -145,7 +149,7 @@ export class Iter<T> implements Iterable<T> {
         }
         prev = elem;
       }
-    }(this.it));
+    }(this));
   }
 }
 
