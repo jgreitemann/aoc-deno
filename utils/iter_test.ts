@@ -227,6 +227,21 @@ Deno.test("Iter.last returns undefined for empty iterables", () => {
   assertEquals(primes.iter().filter(isNotPrime).last(), undefined);
 });
 
+Deno.test("Iter.take returns an iterator over the first N elements", () => {
+  assertEquals(primes.iter().take(4).collect(), primes.slice(0, 4));
+});
+
+Deno.test("Iter.take returns the whole sequence for excessive N", () => {
+  assertEquals(primes.iter().take(42).collect(), primes);
+});
+
+Deno.test("Iter.take can be called multiple times, progressively consuming more elements", () => {
+  const iter = primes.iter();
+  assertEquals(iter.take(2).collect(), primes.slice(0, 2));
+  assertEquals(iter.take(3).collect(), primes.slice(2, 5));
+  assertEquals(iter.take(2).collect(), primes.slice(5));
+});
+
 Deno.test("Iter.find returns the first element satisfying the predicate", () => {
   assertEquals([2, 3, 4, 5, 6, 7].iter().find(isNotPrime), 4);
 });

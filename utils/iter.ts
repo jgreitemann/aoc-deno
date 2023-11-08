@@ -110,6 +110,19 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
     return last;
   }
 
+  take(n: number): Iter<T> {
+    const it = this.it;
+    return new Iter({
+      next(): IteratorResult<T> {
+        if (--n >= 0) {
+          return it.next();
+        } else {
+          return { done: true, value: undefined };
+        }
+      },
+    });
+  }
+
   find(predicate: (elem: T) => boolean): T | undefined {
     return this.filter(predicate).first();
   }
