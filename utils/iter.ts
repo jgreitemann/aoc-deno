@@ -111,6 +111,9 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
   }
 
   take(n: number): Iter<T> {
+    if (n < 0) {
+      throw new RangeError("Argument to Iter.take must not be negative");
+    }
     const it = this.it;
     return new Iter({
       next(): IteratorResult<T> {
@@ -121,6 +124,14 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
         }
       },
     });
+  }
+
+  skip(n: number): Iter<T> {
+    if (n < 0) {
+      throw new RangeError("Argument to Iter.skip must not be negative");
+    }
+    while (--n >= 0 && !this.it.next().done);
+    return this;
   }
 
   find(predicate: (elem: T) => boolean): T | undefined {

@@ -1,4 +1,7 @@
-import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
+import {
+  assertEquals,
+  assertThrows,
+} from "https://deno.land/std@0.201.0/assert/mod.ts";
 import "./iter.ts";
 import { zip } from "./iter.ts";
 
@@ -240,6 +243,31 @@ Deno.test("Iter.take can be called multiple times, progressively consuming more 
   assertEquals(iter.take(2).collect(), primes.slice(0, 2));
   assertEquals(iter.take(3).collect(), primes.slice(2, 5));
   assertEquals(iter.take(2).collect(), primes.slice(5));
+});
+
+Deno.test("Iter.take throws for negative N", () => {
+  assertThrows(() => primes.iter().take(-3));
+});
+
+Deno.test("Iter.take rounds down for non-integer N", () => {
+  assertEquals(primes.iter().take(Math.PI).collect(), primes.slice(0, 3));
+});
+
+Deno.test("Iter.skip returns the remaining elements of the sequence", () => {
+  assertEquals(primes.iter().skip(3).collect(), primes.slice(3));
+  assertEquals(primes.iter().skip(0).collect(), primes);
+});
+
+Deno.test("Iter.skip returns an empty iterator for excessive N", () => {
+  assertEquals(primes.iter().skip(42).collect(), []);
+});
+
+Deno.test("Iter.skip throws for negative N", () => {
+  assertThrows(() => primes.iter().skip(-3));
+});
+
+Deno.test("Iter.skip rounds down for non-integer N", () => {
+  assertEquals(primes.iter().skip(Math.PI).collect(), primes.slice(3));
 });
 
 Deno.test("Iter.find returns the first element satisfying the predicate", () => {
