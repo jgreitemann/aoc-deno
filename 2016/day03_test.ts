@@ -1,5 +1,5 @@
 import { assert } from "https://deno.land/std@0.201.0/assert/mod.ts";
-import soln, { isTriangle } from "./day03.ts";
+import soln, { isTriangle, rearrangeData } from "./day03.ts";
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/assert_equals.ts";
 import { assertThrows } from "https://deno.land/std@0.201.0/assert/assert_throws.ts";
 
@@ -38,4 +38,24 @@ Deno.test("`parse` throws if any line does not contain exactly three numbers", (
   assertThrows(() => soln.parse("1 2"));
   assertThrows(() => soln.parse("1 2 3 4"));
   assertThrows(() => soln.parse("1 2 3\n 4 5\n 6 7 8"));
+});
+
+Deno.test("Data is rearranged correctly", () => {
+  const input: [number, number, number][] = [
+    [101, 301, 501],
+    [102, 302, 502],
+    [103, 303, 503],
+    [201, 401, 601],
+    [202, 402, 602],
+    [203, 403, 603],
+  ];
+  const output: [number, number, number][] = [
+    [101, 102, 103],
+    [201, 202, 203],
+    [301, 302, 303],
+    [401, 402, 403],
+    [501, 502, 503],
+    [601, 602, 603],
+  ];
+  assertEquals(rearrangeData(input), output);
 });

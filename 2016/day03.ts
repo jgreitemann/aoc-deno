@@ -1,4 +1,5 @@
 import { Solution } from "../solution.ts";
+import { zip } from "../utils/iter.ts";
 
 export default <Solution<[number, number, number][]>> {
   parse(input: string): [number, number, number][] {
@@ -20,10 +21,20 @@ export default <Solution<[number, number, number][]>> {
   part1(data: [number, number, number][]): string {
     return data.filter((trig) => isTriangle(...trig)).length.toString();
   },
+
+  part2(data: [number, number, number][]): string {
+    return this.part1!(rearrangeData(data));
+  },
 };
 
 export function isTriangle(a: number, b: number, c: number): boolean {
   const sortedSides: [number, number, number] = [a, b, c];
   sortedSides.sort((lhs, rhs) => lhs - rhs);
   return sortedSides[0] > 0 && sortedSides[0] + sortedSides[1] > sortedSides[2];
+}
+
+export function rearrangeData(
+  data: [number, number, number][],
+): [number, number, number][] {
+  return zip(...data).flatten().chunks(3).collect();
 }
