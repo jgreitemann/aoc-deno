@@ -274,6 +274,28 @@ Deno.test("Iter.find returns the first element satisfying the predicate", () => 
   assertEquals([2, 3, 4, 5, 6, 7].iter().find(isNotPrime), 4);
 });
 
+Deno.test("Iter.chunks returns an iterator over non-overlapping subarrays", () => {
+  assertEquals(
+    primes.iter().chunks(1).collect(),
+    primes.map((x) => [x] as [number]),
+  );
+  assertEquals(primes.iter().chunks(2).collect(), [[2, 3], [5, 7], [11, 13]]);
+  assertEquals(primes.iter().chunks(3).collect(), [[2, 3, 5], [7, 11, 13]]);
+  assertEquals(primes.iter().chunks(4).collect(), [[2, 3, 5, 7]]);
+});
+
+Deno.test("Iter.chunks throws for non-positive N", () => {
+  assertThrows(() => primes.iter().chunks(0));
+  assertThrows(() => primes.iter().chunks(-3));
+});
+
+Deno.test("Iter.chunks rounds down for non-integer N", () => {
+  assertEquals(
+    primes.iter().chunks(Math.PI).collect(),
+    primes.iter().chunks(3).collect(),
+  );
+});
+
 Deno.test("Iter.find returns undefined if none of the elements satisfy the predicate", () => {
   assertEquals(primes.iter().find(isNotPrime), undefined);
   assertEquals([].iter().find((_) => true), undefined);

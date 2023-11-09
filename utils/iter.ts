@@ -1,3 +1,5 @@
+import { isTuple, Tuple } from "./tuple.ts";
+
 declare global {
   interface Object {
     iter<T>(this: Iterable<T>): Iter<T>;
@@ -132,6 +134,23 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
     }
     while (--n >= 0 && !this.it.next().done);
     return this;
+  }
+
+  chunks<N extends number>(n: N): Iter<Tuple<T, N>> {
+    if (n <= 0) {
+      throw new RangeError("Argument to Iter.chunks must be positive");
+    }
+    const it = new Iter(this.it);
+    return new Iter({
+      next(): IteratorResult<Tuple<T, N>> {
+        const value = it.take(n).collect();
+        if (isTuple(value, n)) {
+          return { done: false, value };
+        } else {
+          return { done: true, value: undefined };
+        }
+      },
+    });
   }
 
   find(predicate: (elem: T) => boolean): T | undefined {
