@@ -20,7 +20,16 @@ function solve<T>(solution: Solution<T>, input: string) {
 }
 
 async function run() {
-  const session = Deno.env.get("SESSION")!;
+  const session = Deno.env.get("SESSION");
+
+  if (session === undefined) {
+    console.error(
+      "%cThe SESSION environment variable is not defined!",
+      "color: red; text-weight: bold",
+    );
+    return;
+  }
+
   const cacheName = `aoc-input-session-${session}`;
 
   // console.log("Disabled cache: ", await caches.delete(cacheName));
