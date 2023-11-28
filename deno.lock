@@ -70,6 +70,7 @@
     "https://deno.land/std@0.207.0/encoding/base64.ts": "81c0ecff5ccb402def58ca03d8bd245bd01da15a077d3362b568e991aa10f4d9",
     "https://deno.land/std@0.207.0/encoding/base64url.ts": "b15a4c8c988362536334a31dbb75a2429346f8c0f9e2662f961567c5dd2f58e1",
     "https://deno.land/std@0.207.0/encoding/hex.ts": "a384101d02cd87036c708f540825feb5b073c8527a00d635e48b2e69c992a5f9",
+    "https://deno.land/std@0.208.0/fmt/duration.ts": "1dc8d51e85fc566f8fb1bb89b3b252298bd649bec5dd4fdb0f03ac52179ca7ad",
     "https://deno.land/x/uuid@v0.1.2/mod.ts": "efc48233163b385262e5ec79662ad76f7684ad80080fc69a140c6e01e56c75d8",
     "https://deno.land/x/uuid@v0.1.2/v4.ts": "00392ef1efb815545d6b0ec5fb0260d4ed4295259abc3162766e397c47226a7b"
   }

@@ -1,21 +1,45 @@
+import { format } from "https://deno.land/std@0.208.0/fmt/duration.ts";
+
 import { cachingFetch } from "./cache.ts";
 import { Solution } from "./solution.ts";
+
+function timed<T>(f: () => T): { result: T; elapsedMs: number } {
+  const start = performance.now();
+  const result = f();
+  const end = performance.now();
+  return { result, elapsedMs: end - start };
+}
+
+enum Part {
+  Part1 = "Part 1",
+  Part2 = "Part 2",
+}
+
+function solvePart(part: Part, fn: () => string) {
+  let { result, elapsedMs } = timed(fn);
+  if (elapsedMs > 1) {
+    elapsedMs = Math.round(elapsedMs);
+  } else {
+    elapsedMs = Math.round(elapsedMs * 1000) / 1000;
+  }
+  const elapsedFormat = elapsedMs > 0
+    ? format(elapsedMs, { ignoreZero: true })
+    : "0ms";
+  console.log(
+    `%c${part}: %c${result}%c [${elapsedFormat}]`,
+    "color: gray",
+    "color: white; font-weight: bold",
+    "color: gray",
+  );
+}
 
 function solve<T>(solution: Solution<T>, input: string) {
   const data = solution.parse(input);
   if (solution.part1) {
-    console.log(
-      "%cPart 1: %c" + solution.part1(data),
-      "color: gray",
-      "color: white; font-weight: bold",
-    );
+    solvePart(Part.Part1, () => solution.part1!(data));
   }
   if (solution.part2) {
-    console.log(
-      "%cPart 2: %c" + solution.part2(data),
-      "color: gray",
-      "color: white; font-weight: bold",
-    );
+    solvePart(Part.Part2, () => solution.part2!(data));
   }
 }
 
