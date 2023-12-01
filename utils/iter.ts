@@ -223,3 +223,7 @@ export function zip<Args extends ReadonlyArray<Iterable<unknown>>>(
     }(args),
   );
 }
+
+export function sum(seq: Iterable<number>): number {
+  return seq.iter().fold((acc, x) => acc + x, 0);
+}
