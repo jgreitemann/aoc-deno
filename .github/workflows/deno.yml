@@ -37,5 +37,8 @@ jobs:
           path: ${{ env.DENO_DIR }}
           key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
+      - name: Check WASM up-to-date
+        run: deno task wasmbuild --check
+
       - name: Run tests
         run: deno test -A
