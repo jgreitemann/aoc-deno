@@ -9,7 +9,7 @@ import { cachingFetch } from "./cache.ts";
 
 class UUIDServer {
   #abortController: AbortController;
-  #server: Deno.Server;
+  #server: Deno.HttpServer;
 
   constructor(opts: Deno.ServeOptions) {
     this.#abortController = new AbortController();
