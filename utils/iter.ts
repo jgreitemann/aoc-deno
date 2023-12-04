@@ -41,6 +41,24 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
     return acc;
   }
 
+  any(predicate: (elem: T) => boolean): boolean {
+    for (const elem of this) {
+      if (predicate(elem)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  all(predicate: (elem: T) => boolean): boolean {
+    for (const elem of this) {
+      if (!predicate(elem)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   scan<U>(callback: (state: U, elem: T) => U | undefined, initial: U): Iter<U> {
     return new Iter(function* (it: Iterable<T>): Generator<U> {
       let state = initial;

@@ -73,6 +73,18 @@ Deno.test("Iter.fold can work with heterogeneous types", () => {
   );
 });
 
+Deno.test("Iter.any aligns with Array.some", () => {
+  assertEquals(primes.iter().any(isNotPrime), primes.some(isNotPrime));
+  assertEquals([1, 2, 3].iter().any(isNotPrime), [1, 2, 3].some(isNotPrime));
+  assertEquals([2, 4, 8].iter().any(isNotPrime), [2, 4, 8].some(isNotPrime));
+});
+
+Deno.test("Iter.all aligns with Array.every", () => {
+  assertEquals(primes.iter().all(isNotPrime), primes.every(isNotPrime));
+  assertEquals([1, 2, 3].iter().all(isNotPrime), [1, 2, 3].every(isNotPrime));
+  assertEquals([2, 4, 8].iter().all(isNotPrime), [2, 4, 8].every(isNotPrime));
+});
+
 Deno.test("Iter.scan produces sequence of partial reductions", () => {
   const partialReductions = <U>(
     f: (acc: U, elem: number) => U,
