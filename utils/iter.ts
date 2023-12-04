@@ -239,3 +239,7 @@ export function zip<Args extends ReadonlyArray<Iterable<unknown>>>(
 export function sum(seq: Iterable<number>): number {
   return iter(seq).fold((acc, x) => acc + x, 0);
 }
+
+export function product(seq: Iterable<number>): number {
+  return iter(seq).fold((acc, x) => acc * x, 1);
+}
