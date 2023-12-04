@@ -7,6 +7,7 @@ import soln, {
   move,
   stepWise,
 } from "./day01.ts";
+import { iter } from "../utils/iter.ts";
 
 Deno.test("`move` carries out rotation instructions", () => {
   assertEquals(
@@ -141,7 +142,7 @@ Deno.test("`stepWise` does not mutate the input translation instruction", () => 
 
 Deno.test("`flatMap(stepWise)` produces the intended sequence of instructions", () => {
   assertEquals(
-    [...soln.parse("R3").iter().flatMap(stepWise)],
+    [...iter(soln.parse("R3")).flatMap(stepWise)],
     [
       {
         kind: "rotate",
@@ -166,8 +167,8 @@ Deno.test("`flatMap(stepWise)` produces the intended sequence of instructions", 
 Deno.test("Final position is the same, with or without applying `stepWise`", () => {
   const instructions = soln.parse("R8, R4, R4, R8");
   assertEquals(
-    instructions.iter().flatMap(stepWise).fold(move, INITIAL),
-    instructions.iter().fold(move, INITIAL),
+    iter(instructions).flatMap(stepWise).fold(move, INITIAL),
+    iter(instructions).fold(move, INITIAL),
   );
 });
 

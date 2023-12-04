@@ -2,8 +2,8 @@ import {
   assertEquals,
   assertThrows,
 } from "https://deno.land/std@0.201.0/assert/mod.ts";
-import "./iter.ts";
-import { zip } from "./iter.ts";
+
+import { iter, zip } from "./iter.ts";
 
 const primes = [2, 3, 5, 7, 11, 13];
 const sum = (acc: number, elem: number) => acc + elem;
@@ -19,7 +19,7 @@ const isNotPrime = (n: number): boolean => {
 
 Deno.test("Iter is an iterable wrapper around Array", () => {
   const received: number[] = [];
-  for (const elem of primes.iter()) {
+  for (const elem of iter(primes)) {
     received.push(elem);
   }
   assertEquals(received, primes);
@@ -30,41 +30,40 @@ Deno.test("Iter is an iterable wrapper around a generator", () => {
     yield* primes;
   };
   const received: number[] = [];
-  for (const elem of primesGenerator().iter()) {
+  for (const elem of iter(primesGenerator())) {
     received.push(elem);
   }
   assertEquals(received, primes);
 });
 
 Deno.test("Array can be constructed from an Iter", () => {
-  const received = Array.from(primes.iter());
+  const received = Array.from(iter(primes));
   assertEquals(received, primes);
 });
 
 Deno.test("Iter.reduce aligns with Array.reduce", () => {
-  assertEquals(primes.iter().reduce(sum), primes.reduce(sum));
-  assertEquals(primes.iter().reduce(sumSq), primes.reduce(sumSq));
+  assertEquals(iter(primes).reduce(sum), primes.reduce(sum));
+  assertEquals(iter(primes).reduce(sumSq), primes.reduce(sumSq));
 });
 
 Deno.test("Iter.reduce over an empty sequence returns undefined", () => {
-  assertEquals(([] as number[]).iter().reduce(sum), undefined);
+  assertEquals(iter([] as number[]).reduce(sum), undefined);
 });
 
 Deno.test("Iter.fold aligns with Array.reduce", () => {
-  assertEquals(primes.iter().fold(sum, 0), primes.reduce(sum, 0));
-  assertEquals(primes.iter().fold(sum, 42), primes.reduce(sum, 42));
-  assertEquals(primes.iter().fold(sumSq, 42), primes.reduce(sumSq, 42));
+  assertEquals(iter(primes).fold(sum, 0), primes.reduce(sum, 0));
+  assertEquals(iter(primes).fold(sum, 42), primes.reduce(sum, 42));
+  assertEquals(iter(primes).fold(sumSq, 42), primes.reduce(sumSq, 42));
 });
 
 Deno.test("Iter.fold over an empty sequence returns the initial value", () => {
-  assertEquals(([] as number[]).iter().fold(sum, 0), 0);
-  assertEquals(([] as number[]).iter().fold(sum, 42), 42);
+  assertEquals(iter([] as number[]).fold(sum, 0), 0);
+  assertEquals(iter([] as number[]).fold(sum, 42), 42);
 });
 
 Deno.test("Iter.fold can work with heterogeneous types", () => {
   assertEquals(
-    primes
-      .iter()
+    iter(primes)
       .fold(
         (acc: string, elem: number) => `${acc}-${elem}`,
         "seq",
@@ -74,15 +73,15 @@ Deno.test("Iter.fold can work with heterogeneous types", () => {
 });
 
 Deno.test("Iter.any aligns with Array.some", () => {
-  assertEquals(primes.iter().any(isNotPrime), primes.some(isNotPrime));
-  assertEquals([1, 2, 3].iter().any(isNotPrime), [1, 2, 3].some(isNotPrime));
-  assertEquals([2, 4, 8].iter().any(isNotPrime), [2, 4, 8].some(isNotPrime));
+  assertEquals(iter(primes).any(isNotPrime), primes.some(isNotPrime));
+  assertEquals(iter([1, 2, 3]).any(isNotPrime), [1, 2, 3].some(isNotPrime));
+  assertEquals(iter([2, 4, 8]).any(isNotPrime), [2, 4, 8].some(isNotPrime));
 });
 
 Deno.test("Iter.all aligns with Array.every", () => {
-  assertEquals(primes.iter().all(isNotPrime), primes.every(isNotPrime));
-  assertEquals([1, 2, 3].iter().all(isNotPrime), [1, 2, 3].every(isNotPrime));
-  assertEquals([2, 4, 8].iter().all(isNotPrime), [2, 4, 8].every(isNotPrime));
+  assertEquals(iter(primes).all(isNotPrime), primes.every(isNotPrime));
+  assertEquals(iter([1, 2, 3]).all(isNotPrime), [1, 2, 3].every(isNotPrime));
+  assertEquals(iter([2, 4, 8]).all(isNotPrime), [2, 4, 8].every(isNotPrime));
 });
 
 Deno.test("Iter.scan produces sequence of partial reductions", () => {
@@ -93,15 +92,15 @@ Deno.test("Iter.scan produces sequence of partial reductions", () => {
     [...primes.keys()].map((n) => primes.slice(0, n + 1).reduce(f, initial));
 
   assertEquals(
-    primes.iter().scan(sum, 0).collect(),
+    iter(primes).scan(sum, 0).collect(),
     partialReductions(sum, 0),
   );
   assertEquals(
-    primes.iter().scan(sum, 42).collect(),
+    iter(primes).scan(sum, 42).collect(),
     partialReductions(sum, 42),
   );
   assertEquals(
-    primes.iter().scan(sumSq, 42).collect(),
+    iter(primes).scan(sumSq, 42).collect(),
     partialReductions(sumSq, 42),
   );
 });
@@ -117,7 +116,7 @@ Deno.test("Iter.scan terminates early when callback returns undefined", () => {
   const sumUntil100 = (lhs: number, rhs: number) =>
     (lhs + rhs < 100) ? lhs + rhs : undefined;
 
-  assertEquals(counting().iter().scan(sumUntil100, 0).collect(), [
+  assertEquals(iter(counting()).scan(sumUntil100, 0).collect(), [
     1,
     3,
     6,
@@ -142,7 +141,7 @@ Deno.test("Iter.flatten can work with nested arrays", () => {
     [],
     [51],
   ];
-  assertEquals(nestedArrays.iter().flatten().collect(), nestedArrays.flat());
+  assertEquals(iter(nestedArrays).flatten().collect(), nestedArrays.flat());
 });
 
 Deno.test("Iter.flatten only removes one level of nesting", () => {
@@ -154,23 +153,23 @@ Deno.test("Iter.flatten only removes one level of nesting", () => {
     [[]],
     [[51]],
   ];
-  assertEquals(nestedArrays.iter().flatten().collect(), nestedArrays.flat(1));
+  assertEquals(iter(nestedArrays).flatten().collect(), nestedArrays.flat(1));
   assertEquals(
-    nestedArrays.iter().flatten().flatten().collect(),
+    iter(nestedArrays).flatten().flatten().collect(),
     nestedArrays.flat(2),
   );
 });
 
 Deno.test("Iter.flatten works across different iterable types", () => {
   assertEquals(
-    ["Hello, ", "world!"].iter().flatten().collect(),
+    iter(["Hello, ", "world!"]).flatten().collect(),
     Array.from("Hello, world!"),
   );
 });
 
 Deno.test("Iter.map aligns with Array.map", () => {
   const double = (x: number) => 2 * x;
-  assertEquals(primes.iter().map(double).collect(), primes.map(double));
+  assertEquals(iter(primes).map(double).collect(), primes.map(double));
 });
 
 Deno.test("Iter.flatMap aligns with Array.flatMap", () => {
@@ -184,11 +183,11 @@ Deno.test("Iter.flatMap aligns with Array.flatMap", () => {
   }
 
   assertEquals(
-    primes.iter().flatMap(repeatArray).collect(),
+    iter(primes).flatMap(repeatArray).collect(),
     primes.flatMap(repeatArray),
   );
   assertEquals(
-    primes.iter().flatMap(repeat).collect(),
+    iter(primes).flatMap(repeat).collect(),
     primes.flatMap(repeatArray),
   );
 });
@@ -196,25 +195,25 @@ Deno.test("Iter.flatMap aligns with Array.flatMap", () => {
 Deno.test("Iter.filter aligns with Array.filter", () => {
   const allNumbers = [...Array(primes[primes.length - 1]).keys()];
   assertEquals(
-    allNumbers.iter().filter(isNotPrime).collect(),
+    iter(allNumbers).filter(isNotPrime).collect(),
     allNumbers.filter(isNotPrime),
   );
-  assertEquals(primes.iter().filter(isNotPrime).collect(), []);
-  assertEquals(primes.iter().filter((x) => x % 2 == 0).collect(), [2]);
+  assertEquals(iter(primes).filter(isNotPrime).collect(), []);
+  assertEquals(iter(primes).filter((x) => x % 2 == 0).collect(), [2]);
 });
 
 Deno.test("Iter.filterMap aligns with Array.map().filter().map() chain", () => {
   const numbers = [...Array(42).keys()];
   const negateEvenOnly = (x: number) => (x % 2 == 0) ? -x : undefined;
   assertEquals(
-    numbers.iter().filterMap(negateEvenOnly).collect(),
+    iter(numbers).filterMap(negateEvenOnly).collect(),
     numbers.map(negateEvenOnly).filter((x) => x !== undefined).map((x) => x!),
   );
 });
 
 Deno.test("Iter.first returns the first element of non-empty iterables", () => {
-  assertEquals(primes.iter().first(), primes[0]);
-  assertEquals([42].iter().first(), 42);
+  assertEquals(iter(primes).first(), primes[0]);
+  assertEquals(iter([42]).first(), 42);
 });
 
 Deno.test("Iter.first only consumes the first iterator element", () => {
@@ -223,98 +222,98 @@ Deno.test("Iter.first only consumes the first iterator element", () => {
     ++count;
     yield count;
   }
-  assertEquals(counter().iter().first(), 1);
+  assertEquals(iter(counter()).first(), 1);
   assertEquals(count, 1);
 });
 
 Deno.test("Iter.first returns undefined for empty iterables", () => {
-  assertEquals([].iter().first(), undefined);
-  assertEquals(primes.iter().filter(isNotPrime).first(), undefined);
+  assertEquals(iter([]).first(), undefined);
+  assertEquals(iter(primes).filter(isNotPrime).first(), undefined);
 });
 
 Deno.test("Iter.last returns the last element of non-empty iterables", () => {
-  assertEquals(primes.iter().last(), primes[primes.length - 1]);
-  assertEquals(primes.iter().filter((x) => x % 2 == 0).last(), 2);
+  assertEquals(iter(primes).last(), primes[primes.length - 1]);
+  assertEquals(iter(primes).filter((x) => x % 2 == 0).last(), 2);
 });
 
 Deno.test("Iter.last returns undefined for empty iterables", () => {
-  assertEquals([].iter().last(), undefined);
-  assertEquals(primes.iter().filter(isNotPrime).last(), undefined);
+  assertEquals(iter([]).last(), undefined);
+  assertEquals(iter(primes).filter(isNotPrime).last(), undefined);
 });
 
 Deno.test("Iter.take returns an iterator over the first N elements", () => {
-  assertEquals(primes.iter().take(4).collect(), primes.slice(0, 4));
+  assertEquals(iter(primes).take(4).collect(), primes.slice(0, 4));
 });
 
 Deno.test("Iter.take returns the whole sequence for excessive N", () => {
-  assertEquals(primes.iter().take(42).collect(), primes);
+  assertEquals(iter(primes).take(42).collect(), primes);
 });
 
 Deno.test("Iter.take can be called multiple times, progressively consuming more elements", () => {
-  const iter = primes.iter();
-  assertEquals(iter.take(2).collect(), primes.slice(0, 2));
-  assertEquals(iter.take(3).collect(), primes.slice(2, 5));
-  assertEquals(iter.take(2).collect(), primes.slice(5));
+  const iterator = iter(primes);
+  assertEquals(iterator.take(2).collect(), primes.slice(0, 2));
+  assertEquals(iterator.take(3).collect(), primes.slice(2, 5));
+  assertEquals(iterator.take(2).collect(), primes.slice(5));
 });
 
 Deno.test("Iter.take throws for negative N", () => {
-  assertThrows(() => primes.iter().take(-3));
+  assertThrows(() => iter(primes).take(-3));
 });
 
 Deno.test("Iter.take rounds down for non-integer N", () => {
-  assertEquals(primes.iter().take(Math.PI).collect(), primes.slice(0, 3));
+  assertEquals(iter(primes).take(Math.PI).collect(), primes.slice(0, 3));
 });
 
 Deno.test("Iter.skip returns the remaining elements of the sequence", () => {
-  assertEquals(primes.iter().skip(3).collect(), primes.slice(3));
-  assertEquals(primes.iter().skip(0).collect(), primes);
+  assertEquals(iter(primes).skip(3).collect(), primes.slice(3));
+  assertEquals(iter(primes).skip(0).collect(), primes);
 });
 
 Deno.test("Iter.skip returns an empty iterator for excessive N", () => {
-  assertEquals(primes.iter().skip(42).collect(), []);
+  assertEquals(iter(primes).skip(42).collect(), []);
 });
 
 Deno.test("Iter.skip throws for negative N", () => {
-  assertThrows(() => primes.iter().skip(-3));
+  assertThrows(() => iter(primes).skip(-3));
 });
 
 Deno.test("Iter.skip rounds down for non-integer N", () => {
-  assertEquals(primes.iter().skip(Math.PI).collect(), primes.slice(3));
+  assertEquals(iter(primes).skip(Math.PI).collect(), primes.slice(3));
 });
 
 Deno.test("Iter.find returns the first element satisfying the predicate", () => {
-  assertEquals([2, 3, 4, 5, 6, 7].iter().find(isNotPrime), 4);
+  assertEquals(iter([2, 3, 4, 5, 6, 7]).find(isNotPrime), 4);
 });
 
 Deno.test("Iter.chunks returns an iterator over non-overlapping subarrays", () => {
   assertEquals(
-    primes.iter().chunks(1).collect(),
+    iter(primes).chunks(1).collect(),
     primes.map((x) => [x] as [number]),
   );
-  assertEquals(primes.iter().chunks(2).collect(), [[2, 3], [5, 7], [11, 13]]);
-  assertEquals(primes.iter().chunks(3).collect(), [[2, 3, 5], [7, 11, 13]]);
-  assertEquals(primes.iter().chunks(4).collect(), [[2, 3, 5, 7]]);
+  assertEquals(iter(primes).chunks(2).collect(), [[2, 3], [5, 7], [11, 13]]);
+  assertEquals(iter(primes).chunks(3).collect(), [[2, 3, 5], [7, 11, 13]]);
+  assertEquals(iter(primes).chunks(4).collect(), [[2, 3, 5, 7]]);
 });
 
 Deno.test("Iter.chunks throws for non-positive N", () => {
-  assertThrows(() => primes.iter().chunks(0));
-  assertThrows(() => primes.iter().chunks(-3));
+  assertThrows(() => iter(primes).chunks(0));
+  assertThrows(() => iter(primes).chunks(-3));
 });
 
 Deno.test("Iter.chunks rounds down for non-integer N", () => {
   assertEquals(
-    primes.iter().chunks(Math.PI).collect(),
-    primes.iter().chunks(3).collect(),
+    iter(primes).chunks(Math.PI).collect(),
+    iter(primes).chunks(3).collect(),
   );
 });
 
 Deno.test("Iter.find returns undefined if none of the elements satisfy the predicate", () => {
-  assertEquals(primes.iter().find(isNotPrime), undefined);
-  assertEquals([].iter().find((_) => true), undefined);
+  assertEquals(iter(primes).find(isNotPrime), undefined);
+  assertEquals(iter([]).find((_) => true), undefined);
 });
 
 Deno.test("Iter.duplicates filters for first-time duplicates", () => {
-  assertEquals([1, 2, 3, 2, 1, 4, 4, 2, 5].iter().duplicates().collect(), [
+  assertEquals(iter([1, 2, 3, 2, 1, 4, 4, 2, 5]).duplicates().collect(), [
     2,
     1,
     4,
@@ -325,7 +324,7 @@ Deno.test("Iter.duplicates uses strict equality comparison by default", () => {
   const a = { value: 42 };
   const b = { value: 17 };
   const c = { value: 17 };
-  assertEquals([a, b, a, c].iter().duplicates().collect(), [a]);
+  assertEquals(iter([a, b, a, c]).duplicates().collect(), [a]);
 });
 
 Deno.test("Iter.duplicates can be used with a custom comparator", () => {
@@ -333,12 +332,12 @@ Deno.test("Iter.duplicates can be used with a custom comparator", () => {
   const b = { value: 17 };
   const c = { value: 17 };
   assertEquals([
-    ...[a, b, a, c].iter().duplicates((lhs, rhs) => lhs.value === rhs.value),
+    ...iter([a, b, a, c]).duplicates((lhs, rhs) => lhs.value === rhs.value),
   ], [a, b]);
 });
 
 Deno.test("Iter.dedup removes consecutive duplicates", () => {
-  assertEquals([1, 2, 2, 2, 3, 3, 4, 5, 2, 2, 3].iter().dedup().collect(), [
+  assertEquals(iter([1, 2, 2, 2, 3, 3, 4, 5, 2, 2, 3]).dedup().collect(), [
     1,
     2,
     3,
@@ -353,7 +352,7 @@ Deno.test("Iter.dedup uses strict equality comparison by default", () => {
   const a = { value: 42 };
   const b = { value: 17 };
   const c = { value: 17 };
-  assertEquals([a, a, b, c].iter().dedup().collect(), [a, b, c]);
+  assertEquals(iter([a, a, b, c]).dedup().collect(), [a, b, c]);
 });
 
 Deno.test("Iter.dedup can be used with a custom comparator", () => {
@@ -361,7 +360,7 @@ Deno.test("Iter.dedup can be used with a custom comparator", () => {
   const b = { value: 17 };
   const c = { value: 17 };
   assertEquals(
-    [a, a, b, c].iter().dedup((lhs, rhs) => lhs.value === rhs.value).collect(),
+    iter([a, a, b, c]).dedup((lhs, rhs) => lhs.value === rhs.value).collect(),
     [a, b],
   );
 });

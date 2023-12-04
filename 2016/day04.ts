@@ -1,8 +1,7 @@
 import { groupBy } from "https://deno.land/std@0.206.0/collections/group_by.ts";
 
-import "../utils/iter.ts";
-
 import { Solution } from "../solution.ts";
+import { iter } from "../utils/iter.ts";
 
 export type Room = {
   encryptedNames: string[];
@@ -52,12 +51,12 @@ export function histogram(string: string): Map<string, number> {
 }
 
 export function isRealRoom(room: Room): boolean {
-  return histogram(room.encryptedNames.join("")).keys().iter().take(5).collect()
+  return iter(histogram(room.encryptedNames.join("")).keys()).take(5).collect()
     .join("") == room.checksum;
 }
 
 export function sectorIdSum(rooms: Room[]): number {
-  return rooms.iter().filter(isRealRoom).fold(
+  return iter(rooms).filter(isRealRoom).fold(
     (sum, room) => sum + room.sectorId,
     0,
   );

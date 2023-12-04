@@ -1,5 +1,5 @@
 import { Solution } from "../solution.ts";
-import "../utils/iter.ts";
+import { iter } from "../utils/iter.ts";
 
 export enum Direction {
   U,
@@ -154,7 +154,7 @@ export default <Solution<Direction[][]>> {
   parse(input: string): Direction[][] {
     return input.split("\n").map((
       line,
-    ) => [...line.iter().filterMap(toDirection)]);
+    ) => [...iter(line).filterMap(toDirection)]);
   },
 
   part1: findBathroomCode(SIMPLE_KEYPAD, 5),
@@ -179,5 +179,5 @@ export function findBathroomCode<K extends number | string>(
   initialKey: K,
 ) {
   return (document: Direction[][]): string =>
-    [...document.iter().scan(executeSequence(keypad), initialKey)].join("");
+    [...iter(document).scan(executeSequence(keypad), initialKey)].join("");
 }

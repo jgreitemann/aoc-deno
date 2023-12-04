@@ -1,6 +1,5 @@
 import { Solution } from "../solution.ts";
-import "../utils/iter.ts";
-import { Iter } from "../utils/iter.ts";
+import { Iter, iter } from "../utils/iter.ts";
 import { Vector, vectorCompare } from "../utils/vec.ts";
 
 export default <Solution<Instruction[]>> {
@@ -14,8 +13,7 @@ export default <Solution<Instruction[]>> {
   },
 
   part1(instructions: Instruction[]): string {
-    const end = instructions
-      .iter()
+    const end = iter(instructions)
       .fold(move, INITIAL);
     return normL1(end.position).toString();
   },
@@ -119,8 +117,7 @@ export function* stepWise(instruction: Instruction): Generator<Instruction> {
 export function intersectionPoints(
   instructions: Iterable<Instruction>,
 ): Iter<Vector<2>> {
-  return instructions
-    .iter()
+  return iter(instructions)
     .flatMap(stepWise)
     .scan(move, INITIAL)
     .map((state) => state.position)

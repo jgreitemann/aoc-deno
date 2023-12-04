@@ -1,14 +1,8 @@
 import { isTuple, Tuple } from "./tuple.ts";
 
-declare global {
-  interface Object {
-    iter<T>(this: Iterable<T>): Iter<T>;
-  }
+export function iter<T>(it: Iterable<T>) {
+  return new Iter(it[Symbol.iterator]());
 }
-
-Object.prototype.iter = function <T>(this: Iterable<T>) {
-  return new Iter(this[Symbol.iterator]());
-};
 
 export class Iter<T> implements Iterator<T>, Iterable<T> {
   constructor(private it: Iterator<T>) {}
@@ -182,7 +176,7 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
     };
     return this
       .scan((state: ScanState, elem: T) => {
-        const hit = state.occurrences.iter().find(({ firstOccurrence }) =>
+        const hit = iter(state.occurrences).find(({ firstOccurrence }) =>
           compare(firstOccurrence, elem)
         );
         if (hit !== undefined) {
@@ -230,7 +224,7 @@ export function zip<Args extends ReadonlyArray<Iterable<unknown>>>(
       const iters = args.map((iterable) => iterable[Symbol.iterator]());
       while (true) {
         const values = [
-          ...iters.iter().map((it) => it.next()).filterMap((res) =>
+          ...iter(iters).map((it) => it.next()).filterMap((res) =>
             !res.done ? res.value : undefined
           ),
         ];
@@ -243,5 +237,5 @@ export function zip<Args extends ReadonlyArray<Iterable<unknown>>>(
 }
 
 export function sum(seq: Iterable<number>): number {
-  return seq.iter().fold((acc, x) => acc + x, 0);
+  return iter(seq).fold((acc, x) => acc + x, 0);
 }
