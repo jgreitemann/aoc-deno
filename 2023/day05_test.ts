@@ -46,48 +46,48 @@ const EXAMPLE_ALMANAC: Almanac = {
   mappings: [
     {
       ranges: [
-        { sourceStart: 50, destinationStart: 98, length: 2 },
-        { sourceStart: 52, destinationStart: 50, length: 48 },
+        { destinationStart: 50, sourceStart: 98, length: 2 },
+        { destinationStart: 52, sourceStart: 50, length: 48 },
       ],
     },
     {
       ranges: [
-        { sourceStart: 0, destinationStart: 15, length: 37 },
-        { sourceStart: 37, destinationStart: 52, length: 2 },
-        { sourceStart: 39, destinationStart: 0, length: 15 },
+        { destinationStart: 0, sourceStart: 15, length: 37 },
+        { destinationStart: 37, sourceStart: 52, length: 2 },
+        { destinationStart: 39, sourceStart: 0, length: 15 },
       ],
     },
     {
       ranges: [
-        { sourceStart: 49, destinationStart: 53, length: 8 },
-        { sourceStart: 0, destinationStart: 11, length: 42 },
-        { sourceStart: 42, destinationStart: 0, length: 7 },
-        { sourceStart: 57, destinationStart: 7, length: 4 },
+        { destinationStart: 49, sourceStart: 53, length: 8 },
+        { destinationStart: 0, sourceStart: 11, length: 42 },
+        { destinationStart: 42, sourceStart: 0, length: 7 },
+        { destinationStart: 57, sourceStart: 7, length: 4 },
       ],
     },
     {
       ranges: [
-        { sourceStart: 88, destinationStart: 18, length: 7 },
-        { sourceStart: 18, destinationStart: 25, length: 70 },
+        { destinationStart: 88, sourceStart: 18, length: 7 },
+        { destinationStart: 18, sourceStart: 25, length: 70 },
       ],
     },
     {
       ranges: [
-        { sourceStart: 45, destinationStart: 77, length: 23 },
-        { sourceStart: 81, destinationStart: 45, length: 19 },
-        { sourceStart: 68, destinationStart: 64, length: 13 },
+        { destinationStart: 45, sourceStart: 77, length: 23 },
+        { destinationStart: 81, sourceStart: 45, length: 19 },
+        { destinationStart: 68, sourceStart: 64, length: 13 },
       ],
     },
     {
       ranges: [
-        { sourceStart: 0, destinationStart: 69, length: 1 },
-        { sourceStart: 1, destinationStart: 0, length: 69 },
+        { destinationStart: 0, sourceStart: 69, length: 1 },
+        { destinationStart: 1, sourceStart: 0, length: 69 },
       ],
     },
     {
       ranges: [
-        { sourceStart: 60, destinationStart: 56, length: 37 },
-        { sourceStart: 56, destinationStart: 93, length: 4 },
+        { destinationStart: 60, sourceStart: 56, length: 37 },
+        { destinationStart: 56, sourceStart: 93, length: 4 },
       ],
     },
   ],

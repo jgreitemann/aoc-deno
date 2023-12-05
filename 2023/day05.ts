@@ -25,8 +25,8 @@ export type ResourceMapping = {
 };
 
 export type MappingRange = {
-  sourceStart: number;
   destinationStart: number;
+  sourceStart: number;
   length: number;
 };
 
@@ -41,9 +41,9 @@ export function parseAlmanac(input: string): Almanac {
       const [_heading, ...ranges] = section.split("\n");
       return {
         ranges: ranges.map((rangeStr) => {
-          const [sourceStart, destinationStart, length] = rangeStr.split(" ")
+          const [destinationStart, sourceStart, length] = rangeStr.split(" ")
             .map((num) => +num);
-          return { sourceStart, destinationStart, length };
+          return { destinationStart, sourceStart, length };
         }),
       };
     }),
@@ -52,14 +52,14 @@ export function parseAlmanac(input: string): Almanac {
 
 export function mapFn(
   mapping: ResourceMapping,
-): (destination: number) => number {
-  return (destination: number) => {
+): (source: number) => number {
+  return (source: number) => {
     const applicableRange = mapping.ranges.find((range) =>
-      range.destinationStart <= destination &&
-      destination < range.destinationStart + range.length
+      range.sourceStart <= source &&
+      source < range.sourceStart + range.length
     );
-    return (applicableRange?.sourceStart ?? 0) -
-      (applicableRange?.destinationStart ?? 0) + destination;
+    return (applicableRange?.destinationStart ?? 0) -
+      (applicableRange?.sourceStart ?? 0) + source;
   };
 }
 
