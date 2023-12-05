@@ -4,12 +4,17 @@ import { iter } from "../utils/iter.ts";
 export default <Solution<Almanac>> {
   parse: parseAlmanac,
   part1(almanac: Almanac): string {
-    return Math.min(...findLocations(almanac.initialSeeds, almanac.mappings))
+    return Math.min(
+      ...findLocations(
+        asIndividualSeeds(almanac.initialSeeds),
+        almanac.mappings,
+      ),
+    )
       .toString();
   },
   part2(almanac: Almanac): string {
     return Math.min(
-      ...findLocations(expandSeeds(almanac.initialSeeds), almanac.mappings),
+      ...findLocations(asSeedRuns(almanac.initialSeeds), almanac.mappings),
     )
       .toString();
   },
@@ -27,6 +32,11 @@ export type ResourceMapping = {
 export type MappingRange = {
   destinationStart: number;
   sourceStart: number;
+  length: number;
+};
+
+export type Run = {
+  start: number;
   length: number;
 };
 
@@ -52,35 +62,69 @@ export function parseAlmanac(input: string): Almanac {
 
 export function mapFn(
   mapping: ResourceMapping,
-): (source: number) => number {
-  return (source: number) => {
-    const applicableRange = mapping.ranges.find((range) =>
-      range.sourceStart <= source &&
-      source < range.sourceStart + range.length
-    );
-    return (applicableRange?.destinationStart ?? 0) -
-      (applicableRange?.sourceStart ?? 0) + source;
-  };
+): (sources: Run[]) => Run[] {
+  return (sources: Run[]) => (
+    sources.flatMap((source) => {
+      const remainder: Run = { ...source };
+      const result: Run[] = [];
+
+      while (remainder.length > 0) {
+        const applicableRange = mapping.ranges.find((range) =>
+          range.sourceStart <= remainder.start &&
+          remainder.start < range.sourceStart + range.length
+        );
+        if (applicableRange) {
+          const applicableLength = Math.min(
+            remainder.length,
+            applicableRange.length - remainder.start +
+              applicableRange.sourceStart,
+          );
+
+          result.push({
+            start: applicableRange.destinationStart + remainder.start -
+              applicableRange.sourceStart,
+            length: applicableLength,
+          });
+          remainder.start += applicableLength;
+          remainder.length -= applicableLength;
+        } else {
+          const applicableLength = Math.min(
+            remainder.length,
+            ...mapping.ranges.map((r) => r.destinationStart - remainder.start)
+              .filter((s) => s >= 0),
+          );
+
+          result.push({ start: remainder.start, length: applicableLength });
+          remainder.start += applicableLength;
+          remainder.length -= applicableLength;
+        }
+      }
+
+      return result;
+    })
+  );
 }
 
-function pipe(...fns: ((x: number) => number)[]): (x: number) => number {
+function pipe<T>(...fns: ((x: T) => T)[]): (x: T) => T {
   return (x) => fns.reduce((acc, fn) => fn(acc), x);
 }
 
 export function findLocations(
-  initialSeeds: number[],
+  initialSeeds: Run[],
   mappings: ResourceMapping[],
 ): number[] {
   const piped = pipe(...mappings.map(mapFn));
-  return initialSeeds.map(piped);
+  return piped(initialSeeds)
+    .map((run) => run.start);
 }
 
-function range(size: number, startAt = 0): ReadonlyArray<number> {
-  return [...Array(size).keys()].map((i) => i + startAt);
+export function asIndividualSeeds(seeds: number[]): Run[] {
+  return seeds.map((start) => ({ start, length: 1 }));
 }
 
-export function expandSeeds(seedRanges: number[]): number[] {
-  return iter(seedRanges).chunks(2).flatMap(([begin, length]) =>
-    range(length, begin)
-  ).collect();
+export function asSeedRuns(seedRuns: number[]): Run[] {
+  return iter(seedRuns)
+    .chunks(2)
+    .map(([start, length]) => ({ start, length }))
+    .collect();
 }

@@ -1,7 +1,8 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
 import {
   Almanac,
-  expandSeeds,
+  asIndividualSeeds,
+  asSeedRuns,
   findLocations,
   mapFn,
   parseAlmanac,
@@ -99,12 +100,20 @@ Deno.test("Example almanac can be parsed", () => {
 
 Deno.test("Initial seeds are mapped to soil types", () => {
   const seedToSoil = mapFn(EXAMPLE_ALMANAC.mappings[0]);
-  assertEquals(EXAMPLE_ALMANAC.initialSeeds.map(seedToSoil), [81, 14, 57, 13]);
+  assertEquals(seedToSoil(asIndividualSeeds(EXAMPLE_ALMANAC.initialSeeds)), [
+    { start: 81, length: 1 },
+    { start: 14, length: 1 },
+    { start: 57, length: 1 },
+    { start: 13, length: 1 },
+  ]);
 });
 
 Deno.test("Locations are determined", () => {
   assertEquals(
-    findLocations(EXAMPLE_ALMANAC.initialSeeds, EXAMPLE_ALMANAC.mappings),
+    findLocations(
+      asIndividualSeeds(EXAMPLE_ALMANAC.initialSeeds),
+      EXAMPLE_ALMANAC.mappings,
+    ),
     [82, 43, 86, 35],
   );
 });
@@ -113,7 +122,7 @@ Deno.test("Minimum location of expanded seeds is identified", () => {
   assertEquals(
     Math.min(
       ...findLocations(
-        expandSeeds(EXAMPLE_ALMANAC.initialSeeds),
+        asSeedRuns(EXAMPLE_ALMANAC.initialSeeds),
         EXAMPLE_ALMANAC.mappings,
       ),
     ),
