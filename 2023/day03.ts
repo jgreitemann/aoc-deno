@@ -3,7 +3,11 @@ import { Solution } from "../solution.ts";
 import { iter, product, sum } from "../utils/iter.ts";
 import { Vector } from "../utils/vec.ts";
 
-import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
+import {
+  Hasher,
+  HashMap,
+  HashSet,
+} from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 
 export default <Solution<Schematic>> {
   parse: parseSchematic,
@@ -14,6 +18,10 @@ export default <Solution<Schematic>> {
     return sum(gearRatios(schematic)).toString();
   },
 };
+
+const FlatHashMap = HashMap.createContext({
+  hasher: Hasher.anyFlatHasher(),
+});
 
 export type Point = Vector<2>;
 
@@ -63,22 +71,22 @@ export function partNumbers(schematic: Schematic): number[] {
 }
 
 export function gearRatios(schematic: Schematic): number[] {
-  const adjacentParts = new Map<string, number[]>(
+  const adjacentParts = FlatHashMap.from(
     iter(schematic.symbols.entries()).filterMap(([coords, s]) =>
-      s === "*" ? [coords.toString(), []] : undefined
+      s === "*" ? [coords, []] as [Point, number[]] : undefined
     ),
   );
 
   for (const [p, num] of schematic.numbers) {
     for (const q of surroundingPoints(p, num.length)) {
-      const potentialGear = adjacentParts.get(q.toString());
+      const potentialGear = adjacentParts.get(q);
       if (potentialGear !== undefined) {
         potentialGear.push(+num);
       }
     }
   }
 
-  return iter(adjacentParts.values())
+  return iter(adjacentParts.streamValues())
     .filter((parts) => parts.length >= 2)
     .map(product)
     .collect();
