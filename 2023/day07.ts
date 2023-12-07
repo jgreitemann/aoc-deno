@@ -98,11 +98,24 @@ function allSame<T>(seq: T[]): boolean {
 }
 
 export function typeOfHandWithJoker(hand: Hand): TypeOfHand {
-  return Math.max(
-    ...Object.keys(VALUATION).map((substitute) =>
-      typeOfHand(hand.map((c) => c === "J" ? substitute : c) as Hand)
-    ),
-  );
+  const handWithoutJokers = hand.filter((c) => c !== "J");
+
+  const frequencies = new Map<Card, number>();
+  for (const card of handWithoutJokers) {
+    const prevFreq = frequencies.get(card) ?? 0;
+    frequencies.set(card, prevFreq + 1);
+  }
+
+  let substitute: Card = "A";
+  let highestFrequency = 0;
+  for (const [card, freq] of frequencies.entries()) {
+    if (freq > highestFrequency) {
+      highestFrequency = freq;
+      substitute = card;
+    }
+  }
+
+  return typeOfHand(hand.map((c) => c === "J" ? substitute : c) as Hand);
 }
 
 export function compareHands(lhs: Hand, rhs: Hand, rules: Rules): number {
