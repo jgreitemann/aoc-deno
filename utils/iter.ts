@@ -53,6 +53,14 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
     return true;
   }
 
+  count(): number {
+    let count = 0;
+    for (const _ of this) {
+      ++count;
+    }
+    return count;
+  }
+
   scan<U>(callback: (state: U, elem: T) => U | undefined, initial: U): Iter<U> {
     return new Iter(function* (it: Iterable<T>): Generator<U> {
       let state = initial;
