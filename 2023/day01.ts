@@ -6,12 +6,12 @@ export default <Solution<string[]>> {
     return input.split("\n");
   },
 
-  part1(data: string[]): string {
-    return sum(data.map(demangle)).toString();
+  part1(data: string[]): number {
+    return sum(data.map(demangle));
   },
 
-  part2(data: string[]): string {
-    return sum(data.map(demangleWithWords)).toString();
+  part2(data: string[]): number {
+    return sum(data.map(demangleWithWords));
   },
 };
 

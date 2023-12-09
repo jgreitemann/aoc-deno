@@ -3,20 +3,18 @@ import { iter } from "../utils/iter.ts";
 
 export default <Solution<Almanac>> {
   parse: parseAlmanac,
-  part1(almanac: Almanac): string {
+  part1(almanac: Almanac): number {
     return Math.min(
       ...findLocations(
         asIndividualSeeds(almanac.initialSeeds),
         almanac.mappings,
       ),
-    )
-      .toString();
+    );
   },
-  part2(almanac: Almanac): string {
+  part2(almanac: Almanac): number {
     return Math.min(
       ...findLocations(asSeedRuns(almanac.initialSeeds), almanac.mappings),
-    )
-      .toString();
+    );
   },
 };
 

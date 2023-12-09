@@ -14,9 +14,7 @@ export default <Solution<Room[]>> {
     return input.split("\n").map(parseRoom);
   },
 
-  part1(data: Room[]): string {
-    return sectorIdSum(data).toString();
-  },
+  part1: sectorIdSum,
 
   part2(data: Room[]): string {
     const roomPlan = new Map(

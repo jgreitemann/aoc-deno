@@ -3,11 +3,11 @@ import { sum, zip } from "../utils/iter.ts";
 
 export default <Solution<number[][]>> {
   parse: parseHistories,
-  part1(histories: number[][]): string {
-    return sum(histories.map(extrapolateForward)).toString();
+  part1(histories: number[][]): number {
+    return sum(histories.map(extrapolateForward));
   },
-  part2(histories: number[][]): string {
-    return sum(histories.map(extrapolateBackwards)).toString();
+  part2(histories: number[][]): number {
+    return sum(histories.map(extrapolateBackwards));
   },
 };
 

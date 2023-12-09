@@ -5,10 +5,10 @@ import { lcm } from "https://deno.land/x/tiny_math@0.1.4/mod.ts";
 
 export default <Solution<Network>> {
   parse: parseNetworkMap,
-  part1(network: Network): string {
-    return iter(navigateSimpleNetwork(network)).count().toString();
+  part1(network: Network): number {
+    return iter(navigateSimpleNetwork(network)).count();
   },
-  part2(network: Network): string {
+  part2(network: Network): number {
     // The naive solution is way too slow:
     // return iter(navigateGhostNetwork(network)).count().toString();
 
@@ -25,7 +25,7 @@ export default <Solution<Network>> {
     // easy to find inputs for which the LCM trick fails. In those cases, the
     // above solution should still work. I'm including the LCM solution here
     // to prevent this task from slowing down the execution of the AoC suite:
-    return commonPeriod(findGhostOrbits(network)).toString();
+    return commonPeriod(findGhostOrbits(network));
   },
 };
 

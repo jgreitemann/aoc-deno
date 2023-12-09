@@ -68,9 +68,9 @@ Deno.test("`move` carries out translation instructions", () => {
 });
 
 Deno.test("Part 1 examples", () => {
-  assertEquals(soln.part1?.(soln.parse("R2, L3")), "5");
-  assertEquals(soln.part1?.(soln.parse("R2, R2, R2")), "2");
-  assertEquals(soln.part1?.(soln.parse("R5, L5, R5, R3")), "12");
+  assertEquals(soln.part1?.(soln.parse("R2, L3")), 5);
+  assertEquals(soln.part1?.(soln.parse("R2, R2, R2")), 2);
+  assertEquals(soln.part1?.(soln.parse("R5, L5, R5, R3")), 12);
 });
 
 Deno.test("`stepwise` leaves rotation instructions unaltered", () => {

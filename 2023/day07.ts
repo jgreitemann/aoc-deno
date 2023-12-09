@@ -3,11 +3,11 @@ import { sum, zip } from "../utils/iter.ts";
 
 export default <Solution<[Hand, number][]>> {
   parse: parseHands,
-  part1(hands: [Hand, number][]): string {
-    return totalWinnings(hands, Rules.Jack).toString();
+  part1(hands: [Hand, number][]): number {
+    return totalWinnings(hands, Rules.Jack);
   },
-  part2(hands: [Hand, number][]): string {
-    return totalWinnings(hands, Rules.Joker).toString();
+  part2(hands: [Hand, number][]): number {
+    return totalWinnings(hands, Rules.Joker);
   },
 };
 

@@ -1,4 +1,4 @@
-import { Solution } from "../solution.ts";
+import { Solution, ToString } from "../solution.ts";
 import { zip } from "../utils/iter.ts";
 
 export default <Solution<[number, number, number][]>> {
@@ -18,11 +18,11 @@ export default <Solution<[number, number, number][]>> {
     });
   },
 
-  part1(data: [number, number, number][]): string {
-    return data.filter((trig) => isTriangle(...trig)).length.toString();
+  part1(data: [number, number, number][]): number {
+    return data.filter((trig) => isTriangle(...trig)).length;
   },
 
-  part2(data: [number, number, number][]): string {
+  part2(data: [number, number, number][]): ToString {
     return this.part1!(rearrangeData(data));
   },
 };

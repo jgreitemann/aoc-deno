@@ -11,11 +11,11 @@ import {
 
 export default <Solution<Schematic>> {
   parse: parseSchematic,
-  part1(schematic: Schematic): string {
-    return sum(partNumbers(schematic)).toString();
+  part1(schematic: Schematic): number {
+    return sum(partNumbers(schematic));
   },
-  part2(schematic: Schematic): string {
-    return sum(gearRatios(schematic)).toString();
+  part2(schematic: Schematic): number {
+    return sum(gearRatios(schematic));
   },
 };
 

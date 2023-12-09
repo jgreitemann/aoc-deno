@@ -3,11 +3,11 @@ import { sum } from "../utils/iter.ts";
 
 export default <Solution<Game[]>> {
   parse: parseInput,
-  part1(games: Game[]): string {
-    return sumOfPossibleIds(games).toString();
+  part1(games: Game[]): number {
+    return sumOfPossibleIds(games);
   },
-  part2(games: Game[]): string {
-    return sum(games.map(powerOfGame)).toString();
+  part2(games: Game[]): number {
+    return sum(games.map(powerOfGame));
   },
 };
 

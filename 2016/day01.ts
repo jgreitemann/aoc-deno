@@ -12,18 +12,18 @@ export default <Solution<Instruction[]>> {
       ]);
   },
 
-  part1(instructions: Instruction[]): string {
+  part1(instructions: Instruction[]): number {
     const end = iter(instructions)
       .fold(move, INITIAL);
-    return normL1(end.position).toString();
+    return normL1(end.position);
   },
 
-  part2(instructions: Instruction[]): string {
+  part2(instructions: Instruction[]): number {
     const hq = intersectionPoints(instructions).first();
     if (hq === undefined) {
       throw new Error("Path does not intersect with itself");
     }
-    return normL1(hq).toString();
+    return normL1(hq);
   },
 };
 

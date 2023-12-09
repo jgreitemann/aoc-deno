@@ -3,15 +3,15 @@ import { sum } from "../utils/iter.ts";
 
 export default <Solution<Scratchcard[]>> {
   parse: parseCards,
-  part1(cards: Scratchcard[]): string {
+  part1(cards: Scratchcard[]): number {
     return sum(
       cards.map(numberOfMatches).map((wins) =>
         wins > 0 ? (1 << (wins - 1)) : 0
       ),
-    ).toString();
+    );
   },
-  part2(cards: Scratchcard[]): string {
-    return sum(determineCardMultiplicities(cards)).toString();
+  part2(cards: Scratchcard[]): number {
+    return sum(determineCardMultiplicities(cards));
   },
 };
 

@@ -20,10 +20,10 @@ function solvePart(part: Part, fn: () => string) {
 function solve<T>(solution: Solution<T>, input: string) {
   const data = solution.parse(input);
   if (solution.part1) {
-    solvePart(Part.Part1, () => solution.part1!(data));
+    solvePart(Part.Part1, () => solution.part1!(data).toString());
   }
   if (solution.part2) {
-    solvePart(Part.Part2, () => solution.part2!(data));
+    solvePart(Part.Part2, () => solution.part2!(data).toString());
   }
 }
 

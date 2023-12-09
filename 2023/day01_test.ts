@@ -30,7 +30,7 @@ Deno.test("The sum is found correctly", () => {
       "a1b2c3d4e5f",
       "treb7uchet",
     ]),
-    "142",
+    142,
   );
   assertEquals(
     soln.part2!([
@@ -42,6 +42,6 @@ Deno.test("The sum is found correctly", () => {
       "zoneight234",
       "7pqrstsixteen",
     ]),
-    "281",
+    281,
   );
 });

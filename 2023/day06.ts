@@ -3,11 +3,11 @@ import { product, zip } from "../utils/iter.ts";
 
 export default <Solution<Race[]>> {
   parse: parseInput,
-  part1(races: Race[]): string {
-    return product(races.map(waysToBeatRecord)).toString();
+  part1(races: Race[]): number {
+    return product(races.map(waysToBeatRecord));
   },
-  part2(races: Race[]): string {
-    return waysToBeatRecord(unkern(races)).toString();
+  part2(races: Race[]): number {
+    return waysToBeatRecord(unkern(races));
   },
 };
 
