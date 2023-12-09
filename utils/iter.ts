@@ -148,12 +148,51 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
     });
   }
 
+  takeWhile(predicate: (elem: T) => boolean): Iter<T> {
+    const it = this.it;
+    return new Iter({
+      next(): IteratorResult<T> {
+        const res = it.next();
+        if (!res.done && predicate(res.value)) {
+          return res;
+        } else {
+          return { done: true, value: undefined };
+        }
+      },
+    });
+  }
+
+  takeWhileInclusive(predicate: (elem: T) => boolean): Iter<T> {
+    return new Iter(function* (it: Iterable<T>): Generator<T> {
+      for (const elem of it) {
+        yield elem;
+        if (!predicate(elem)) {
+          break;
+        }
+      }
+    }(this));
+  }
+
   skip(n: number): Iter<T> {
     if (n < 0) {
       throw new RangeError("Argument to Iter.skip must not be negative");
     }
     while (--n >= 0 && !this.it.next().done);
     return this;
+  }
+
+  skipWhile(predicate: (elem: T) => boolean): Iter<T> {
+    return new Iter(function* (it: Iterable<T>): Generator<T> {
+      for (const elem of it) {
+        if (!predicate(elem)) {
+          yield elem;
+          break;
+        }
+      }
+      for (const elem of it) {
+        yield elem;
+      }
+    }(this));
   }
 
   chunks<N extends number>(n: N): Iter<Tuple<T, N>> {

@@ -54,12 +54,11 @@ export type Turn = "L" | "R";
 export function* navigateNetwork<T>(
   startingPosition: T,
   takeTurn: (pos: T, turn: Turn, network: Network) => T,
-  goalReached: (pos: T) => boolean,
   network: Network,
 ): Generator<T> {
   let current = startingPosition;
   const turns = [...network.instructions];
-  while (!goalReached(current)) {
+  while (true) {
     const turn = turns.shift()!;
     turns.push(turn);
     current = takeTurn(current, turn, network);
@@ -71,23 +70,19 @@ function takeSingleTurn(pos: string, turn: Turn, network: Network): string {
   return turn === "L" ? network.map.get(pos)![0] : network.map.get(pos)![1];
 }
 
-export function* navigateSimpleNetwork(network: Network): Generator<string> {
-  yield* navigateNetwork(
-    "AAA",
-    takeSingleTurn,
-    (pos) => pos === "ZZZ",
-    network,
-  );
+export function navigateSimpleNetwork(network: Network): Iterable<string> {
+  return iter(navigateNetwork("AAA", takeSingleTurn, network))
+    .takeWhileInclusive((pos) => pos !== "ZZZ");
 }
 
-export function* navigateGhostNetwork(network: Network): Generator<string[]> {
-  yield* navigateNetwork(
+export function navigateGhostNetwork(network: Network): Iterable<string[]> {
+  return iter(navigateNetwork(
     [...network.map.keys()].filter((node) => node.endsWith("A")),
     (pos, turn, network) =>
       pos.map((pos) => takeSingleTurn(pos, turn, network)),
-    (pos) => pos.every((node) => node.endsWith("Z")),
     network,
-  );
+  ))
+    .takeWhileInclusive((pos) => !pos.every((node) => node.endsWith("Z")));
 }
 
 export type Orbit = {
@@ -129,7 +124,7 @@ export function findGhostOrbits(network: Network): Orbit[] {
   );
   return ghostStarts.map((ghost) =>
     findWinningOrbit(
-      navigateNetwork(ghost, takeSingleTurn, () => false, network),
+      navigateNetwork(ghost, takeSingleTurn, network),
       network.instructions.length,
     )
   );

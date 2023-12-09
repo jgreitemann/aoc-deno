@@ -270,6 +270,34 @@ Deno.test("Iter.take rounds down for non-integer N", () => {
   assertEquals(iter(primes).take(Math.PI).collect(), primes.slice(0, 3));
 });
 
+Deno.test("Iter.takeWhile returns the elements up to and not including the first element that violates the predicate", () => {
+  assertEquals(
+    iter(Array(10).keys()).takeWhile((elem) => elem !== 5).collect(),
+    [0, 1, 2, 3, 4],
+  );
+});
+
+Deno.test("Iter.takeWhile returns an empty iterator if the first element violates the predicate", () => {
+  assertEquals(iter(primes).takeWhile(isNotPrime).collect(), []);
+});
+
+Deno.test("Iter.takeWhileInclusive returns the elements up to and including the first element that violates the predicate", () => {
+  assertEquals(
+    iter(Array(10).keys()).takeWhileInclusive((elem) => elem !== 5).collect(),
+    [0, 1, 2, 3, 4, 5],
+  );
+});
+
+Deno.test("Iter.takeWhileInclusive returns an iterator over only the first element if it violates the predicate", () => {
+  assertEquals(iter(primes).takeWhileInclusive(isNotPrime).collect(), [
+    primes[0],
+  ]);
+});
+
+Deno.test("Iter.takeWhileInclusive returns an empty iterator if called on an empty iterable", () => {
+  assertEquals(iter([]).takeWhileInclusive(() => true).collect(), []);
+});
+
 Deno.test("Iter.skip returns the remaining elements of the sequence", () => {
   assertEquals(iter(primes).skip(3).collect(), primes.slice(3));
   assertEquals(iter(primes).skip(0).collect(), primes);
@@ -285,6 +313,17 @@ Deno.test("Iter.skip throws for negative N", () => {
 
 Deno.test("Iter.skip rounds down for non-integer N", () => {
   assertEquals(iter(primes).skip(Math.PI).collect(), primes.slice(3));
+});
+
+Deno.test("Iter.skipWhile returns the elements starting at and including the first element that violates the predicate", () => {
+  assertEquals(
+    iter(Array(10).keys()).skipWhile((elem) => elem !== 5).collect(),
+    [5, 6, 7, 8, 9],
+  );
+});
+
+Deno.test("Iter.skipWhile returns an iterator over all elements if the first element violates the predicate", () => {
+  assertEquals(iter(primes).skipWhile(isNotPrime).collect(), primes);
 });
 
 Deno.test("Iter.find returns the first element satisfying the predicate", () => {
