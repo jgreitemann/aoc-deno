@@ -78,11 +78,9 @@ export function typeOfHand(hand: Hand): TypeOfHand {
     }
   }
 
-  const pairCount = sum(
-    zip(sortedHand.slice(0, 4), sortedHand.slice(1)).map(([lhs, rhs]) =>
-      lhs === rhs ? 1 : 0
-    ),
-  );
+  const pairCount = zip(sortedHand.slice(0, 4), sortedHand.slice(1))
+    .filter(([lhs, rhs]) => lhs === rhs)
+    .count();
 
   if (pairCount >= 2) {
     return TypeOfHand.TwoPair;
@@ -126,18 +124,17 @@ export function compareHands(lhs: Hand, rhs: Hand, rules: Rules): number {
   if (lhs_type !== rhs_type) {
     return lhs_type - rhs_type;
   } else {
-    return zip(lhs, rhs).fold(
-      (acc, [l, r]) => acc === 0 ? valuation[l] - valuation[r] : acc,
-      0,
-    );
+    return zip(lhs, rhs)
+      .fold(
+        (acc, [l, r]) => acc === 0 ? valuation[l] - valuation[r] : acc,
+        0,
+      );
   }
 }
 
 export function totalWinnings(hands: [Hand, number][], rules: Rules): number {
   return sum(
-    hands.toSorted(([lhs], [rhs]) => compareHands(lhs, rhs, rules)).map((
-      [_, bid],
-      index,
-    ) => bid * (index + 1)),
+    hands.toSorted(([lhs], [rhs]) => compareHands(lhs, rhs, rules))
+      .map(([_, bid], index) => bid * (index + 1)),
   );
 }
