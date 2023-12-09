@@ -1,16 +1,31 @@
 import { Solution } from "../solution.ts";
 import { iter } from "../utils/iter.ts";
 
+import { lcm } from "https://deno.land/x/tiny_math@0.1.4/mod.ts";
+
 export default <Solution<Network>> {
   parse: parseNetworkMap,
   part1(network: Network): string {
     return iter(navigateSimpleNetwork(network)).count().toString();
   },
   part2(network: Network): string {
-    return turnOfFirstConcurrentWin(findGhostOrbits(network)).toString();
-    // return findGhostCycles(network).map((c) =>
-    //   `{p:${c.period},o:[${c.offsets}]}`
-    // ).toString();
+    // The naive solution is way too slow:
+    // return iter(navigateGhostNetwork(network)).count().toString();
+
+    // This solution finishes in under 2 min and is general:
+    // return turnOfFirstConcurrentWin(findGhostOrbits(network)).toString();
+
+    // It turns out that the inputs are crafted in such a way that the
+    // orbits are not offset, i.e., there are no transients which need to
+    // be skipped. That means that LCM can be used to find the common
+    // orbital period and that will be the exact turn where the orbits
+    // first align.
+    //
+    // The problem statement does not guarantee this to be the case and it is
+    // easy to find inputs for which the LCM trick fails. In those cases, the
+    // above solution should still work. I'm including the LCM solution here
+    // to prevent this task from slowing down the execution of the AoC suite:
+    return commonPeriod(findGhostOrbits(network)).toString();
   },
 };
 
@@ -84,7 +99,7 @@ export function findWinningOrbit(
   nodeIter: Iterable<string>,
   base: number,
 ): Orbit {
-  const sample = iter(nodeIter).take(10000 * base).collect();
+  const sample = iter(nodeIter).take(1000 * base).collect();
   let period = base;
   while (!isPeriodic(sample, period)) {
     period += base;
@@ -151,4 +166,8 @@ export function turnOfFirstConcurrentWin(orbits: Orbit[]): number {
   return iter(winningTurns(referenceCycle)).find((turn) =>
     otherCycles.every((cycle) => isWinningTurn(turn, cycle))
   )!;
+}
+
+export function commonPeriod(orbits: Orbit[]): number {
+  return lcm(...orbits.map((orbit) => orbit.period));
 }

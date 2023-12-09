@@ -1,5 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
 import {
+  commonPeriod,
   findGhostOrbits,
   findWinningOrbit,
   isWinningTurn,
@@ -111,11 +112,13 @@ Deno.test("Winning orbit is correctly identified", () => {
   );
 });
 
+const GHOST_ORBITS = [
+  { period: 2, offsets: [2] },
+  { period: 6, offsets: [3, 6] },
+];
+
 Deno.test("Ghost orbits are found in example", () => {
-  assertEquals(findGhostOrbits(GHOST_NETWORK), [
-    { period: 2, offsets: [2] },
-    { period: 6, offsets: [3, 6] },
-  ]);
+  assertEquals(findGhostOrbits(GHOST_NETWORK), GHOST_ORBITS);
 });
 
 const EXAMPLE_ORBITS: Orbit[] = [
@@ -162,5 +165,9 @@ Deno.test("Concurrent win is extrapolated correctly based on orbits", () => {
 });
 
 Deno.test("Number of turns required to win the example ghost network", () => {
-  assertEquals(turnOfFirstConcurrentWin(findGhostOrbits(GHOST_NETWORK)), 6);
+  assertEquals(turnOfFirstConcurrentWin(GHOST_ORBITS), 6);
+});
+
+Deno.test("For the example, the winning turn of the ghost network could also be determined through LCM", () => {
+  assertEquals(commonPeriod(GHOST_ORBITS), 6);
 });
