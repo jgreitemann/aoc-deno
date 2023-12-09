@@ -84,6 +84,12 @@ Deno.test("Iter.all aligns with Array.every", () => {
   assertEquals(iter([2, 4, 8]).all(isNotPrime), [2, 4, 8].every(isNotPrime));
 });
 
+Deno.test("Iter.count yields the number of elements", () => {
+  assertEquals(iter([]).count(), 0);
+  assertEquals(iter([42]).count(), 1);
+  assertEquals(iter(primes).count(), primes.length);
+});
+
 Deno.test("Iter.scan produces sequence of partial reductions", () => {
   const partialReductions = <U>(
     f: (acc: U, elem: number) => U,
