@@ -9,8 +9,8 @@ type _Array<T, N extends number, R extends unknown[]> = R["length"] extends N
 export type Vector<N extends number> = FixedLengthArray<number, N>;
 
 export function vectorCompare<N extends number>(
-  lhs: Vector<N>,
-  rhs: Vector<N>,
+  lhs: Readonly<Vector<N>>,
+  rhs: Readonly<Vector<N>>,
 ): boolean {
   for (const idx in lhs) {
     if (lhs[idx] !== rhs[idx]) {
@@ -18,4 +18,22 @@ export function vectorCompare<N extends number>(
     }
   }
   return true;
+}
+
+export function vectorAdd<N extends number>(
+  lhs: Readonly<Vector<N>>,
+  rhs: Readonly<Vector<N>>,
+): Vector<N> {
+  const res = [...lhs] as Vector<N>;
+  for (const i in res) {
+    res[i] += rhs[i];
+  }
+  return res;
+}
+
+export function vectorMul<N extends number>(
+  vec: Readonly<Vector<N>>,
+  scalar: number,
+): Vector<N> {
+  return vec.map((elem) => elem * scalar) as Vector<N>;
 }
