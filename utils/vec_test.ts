@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
-import { vectorAdd, vectorCompare, vectorMul } from "./vec.ts";
+import { vectorAdd, vectorCompare, vectorMul, vectorSub } from "./vec.ts";
 
 Deno.test("vectorCompare compares two vectors for equality", () => {
   const a = [1, 2];
@@ -11,6 +11,10 @@ Deno.test("vectorCompare compares two vectors for equality", () => {
 
 Deno.test("vectorAdd adds two vectors together", () => {
   assertEquals(vectorAdd([1, 2], [3, -1]), [4, 1]);
+});
+
+Deno.test("vectorAdd adds two vectors together", () => {
+  assertEquals(vectorSub([1, 2], [3, -1]), [-2, 3]);
 });
 
 Deno.test("vectorMul multiplies a vector with a scalar", () => {

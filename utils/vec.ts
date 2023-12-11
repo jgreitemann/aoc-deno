@@ -31,6 +31,17 @@ export function vectorAdd<N extends number>(
   return res;
 }
 
+export function vectorSub<N extends number>(
+  lhs: Readonly<Vector<N>>,
+  rhs: Readonly<Vector<N>>,
+): Vector<N> {
+  const res = [...lhs] as Vector<N>;
+  for (const i in res) {
+    res[i] -= rhs[i];
+  }
+  return res;
+}
+
 export function vectorMul<N extends number>(
   vec: Readonly<Vector<N>>,
   scalar: number,
