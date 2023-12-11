@@ -1,22 +1,18 @@
 import { Solution } from "../solution.ts";
 import { Vector, vectorAdd } from "../utils/vec.ts";
 
-import { Hasher, HashMap } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
+import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 
 export default <Solution<string[]>> {
   parse(input: string): string[] {
     return input.split("\n");
   },
   part1(pipes: string[]): number {
-    return traceLoop(pipes).streamValues().max() ?? -1;
+    return Math.floor(traceLoop(pipes).length / 2);
   },
 };
 
 export type Point = Vector<2>;
-
-const FlatHashMap = HashMap.createContext({
-  hasher: Hasher.anyFlatHasher(),
-});
 
 const NORTH = [-1, 0] as const;
 const WEST = [0, -1] as const;
@@ -50,40 +46,41 @@ function invert(direction: Direction): Direction {
   throw new Error("unreachable");
 }
 
-export function traceLoop(pipes: string[]): HashMap<Point, number> {
+export function traceLoop(pipes: string[]): Point[] {
   // TODO: Use case for Iter.findMap
   const startRow = pipes.findIndex((row) => row.includes("S"));
   const startCol = pipes[startRow].indexOf("S");
   const start: Point = [startRow, startCol];
 
-  const loopBuilder = FlatHashMap.builder<Point, number>();
+  const loop: Point[] = [];
+  const loopBuilder = HashSet.builder<Point>();
 
   let looseEnds = [start];
   for (let distance = 0; looseEnds.length > 0; ++distance) {
-    looseEnds = looseEnds.flatMap((p) => {
-      if (loopBuilder.hasKey(p)) {
-        return [];
-      }
+    const p = looseEnds.find((p) => !loopBuilder.has(p));
+    if (p === undefined) {
+      break;
+    }
 
-      const tile = pipes.at(p[0])?.at(p[1]);
-      if (tile === undefined) {
-        return [];
-      }
-      loopBuilder.set(p, distance);
-      const connections = CONNECTIONS.get(tile)!;
-      return connections
-        .map((dir) => ({
-          q: vectorAdd<2>(p, dir),
-          facing: invert(dir),
-        }))
-        .filter(({ q, facing }) => {
-          const tile = pipes.at(q[0])?.at(q[1]);
-          return tile !== undefined &&
-            CONNECTIONS.get(tile)!.includes(facing);
-        })
-        .map(({ q }) => q);
-    });
+    const tile = pipes.at(p[0])?.at(p[1]);
+    if (tile === undefined) {
+      break;
+    }
+    loopBuilder.add(p);
+    loop.push(p);
+    const connections = CONNECTIONS.get(tile)!;
+    looseEnds = connections
+      .map((dir) => ({
+        q: vectorAdd<2>(p, dir),
+        facing: invert(dir),
+      }))
+      .filter(({ q, facing }) => {
+        const tile = pipes.at(q[0])?.at(q[1]);
+        return tile !== undefined &&
+          CONNECTIONS.get(tile)!.includes(facing);
+      })
+      .map(({ q }) => q);
   }
 
-  return loopBuilder.build();
+  return loop;
 }

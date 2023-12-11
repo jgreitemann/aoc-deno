@@ -1,6 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
-import { Point, traceLoop } from "./day10.ts";
-import { HashMap } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
+import { traceLoop } from "./day10.ts";
 
 const SIMPLE_EXAMPLE_PIPES = [
   "-L|F7",
@@ -10,12 +9,15 @@ const SIMPLE_EXAMPLE_PIPES = [
   "L|-JF",
 ];
 
-const SIMPLE_LOOP_DISTANCES = [
-  ".....",
-  ".012.",
-  ".1.3.",
-  ".234.",
-  ".....",
+const SIMPLE_LOOP_POINTS = [
+  [1, 1],
+  [2, 1],
+  [3, 1],
+  [3, 2],
+  [3, 3],
+  [2, 3],
+  [1, 3],
+  [1, 2],
 ];
 
 const COMPLEX_EXAMPLE_PIPES = [
@@ -26,42 +28,29 @@ const COMPLEX_EXAMPLE_PIPES = [
   "LJ...",
 ];
 
-const COMPLEX_LOOP_DISTANCES = [
-  "..45.",
-  ".236.",
-  "01.78",
-  "14567",
-  "23...",
+const COMPLEX_LOOP_POINTS = [
+  [2, 0],
+  [3, 0],
+  [4, 0],
+  [4, 1],
+  [3, 1],
+  [3, 2],
+  [3, 3],
+  [3, 4],
+  [2, 4],
+  [2, 3],
+  [1, 3],
+  [0, 3],
+  [0, 2],
+  [1, 2],
+  [1, 1],
+  [2, 1],
 ];
 
-function assertDistances(
-  distanceMap: HashMap<Point, number>,
-  expected: string[],
-) {
-  for (const [p, distance] of distanceMap) {
-    assertEquals(
-      distance.toString(),
-      expected.at(p[0])?.at(p[1]),
-      `while comparing distance for point (${p})`,
-    );
-  }
-  for (const row in expected) {
-    for (let col = 0; col < expected[row].length; ++col) {
-      if (expected[row][col] !== ".") {
-        assertEquals(
-          distanceMap.get([+row, col]),
-          +expected[row][col],
-          `while comparing distance at point (${row}, ${col})`,
-        );
-      }
-    }
-  }
-}
-
 Deno.test("Simple loop path is traced out and annotated with distance from start", () => {
-  assertDistances(traceLoop(SIMPLE_EXAMPLE_PIPES), SIMPLE_LOOP_DISTANCES);
+  assertEquals(traceLoop(SIMPLE_EXAMPLE_PIPES), SIMPLE_LOOP_POINTS);
 });
 
 Deno.test("Complex loop path is traced out and annotated with distance from start", () => {
-  assertDistances(traceLoop(COMPLEX_EXAMPLE_PIPES), COMPLEX_LOOP_DISTANCES);
+  assertEquals(traceLoop(COMPLEX_EXAMPLE_PIPES), COMPLEX_LOOP_POINTS);
 });
