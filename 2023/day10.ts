@@ -1,5 +1,6 @@
 import { Solution } from "../solution.ts";
-import { Vector, vectorAdd } from "../utils/vec.ts";
+import { sum, zip } from "../utils/iter.ts";
+import { Vector, vectorAdd, vectorSub } from "../utils/vec.ts";
 
 import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 
@@ -9,6 +10,9 @@ export default <Solution<string[]>> {
   },
   part1(pipes: string[]): number {
     return Math.floor(traceLoop(pipes).length / 2);
+  },
+  part2(pipes: string[]): number {
+    return enclosedPoints(traceLoop(pipes)).length;
   },
 };
 
@@ -77,10 +81,46 @@ export function traceLoop(pipes: string[]): Point[] {
       .filter(({ q, facing }) => {
         const tile = pipes.at(q[0])?.at(q[1]);
         return tile !== undefined &&
-          CONNECTIONS.get(tile)!.includes(facing);
+          (CONNECTIONS.get(tile)?.includes(facing) ?? false);
       })
       .map(({ q }) => q);
   }
 
   return loop;
+}
+
+function* neighbors(p: Point): Generator<Point> {
+  yield [p[0] - 1, p[1]];
+  yield [p[0], p[1] - 1];
+  yield [p[0] + 1, p[1]];
+  yield [p[0], p[1] + 1];
+}
+
+export function enclosedPoints(loop: Point[]): Point[] {
+  const winding = Math.sign(sum(
+    zip(loop, [...loop.slice(1), loop[0]])
+      .map(([[x1, y1], [x2, y2]]) => (x2 - x1) * (y2 + y1)),
+  ));
+  const loopSet = HashSet.from(loop);
+  let seeds = zip(loop, [...loop.slice(1), loop[0]])
+    .flatMap(([from, to]) => {
+      const dir = vectorSub<2>(to, from);
+      const inside = [winding * dir[1], -winding * dir[0]] as const;
+      return [vectorAdd<2>(from, inside), vectorAdd<2>(to, inside)];
+    })
+    .filter((p) => !loopSet.has(p))
+    .collect();
+
+  const interior = HashSet.builder<Point>();
+  while (seeds.length > 0) {
+    seeds = seeds.flatMap((seed) => {
+      if (!loopSet.has(seed) && interior.add(seed)) {
+        return [...neighbors(seed)];
+      } else {
+        return [];
+      }
+    });
+  }
+
+  return interior.build().toArray();
 }
