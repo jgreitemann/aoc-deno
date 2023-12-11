@@ -290,3 +290,13 @@ export function sum(seq: Iterable<number>): number {
 export function product(seq: Iterable<number>): number {
   return iter(seq).fold((acc, x) => acc * x, 1);
 }
+
+export function pairs<T>(array: T[]): Iter<[T, T]> {
+  return new Iter(function* (array: T[]): Generator<[T, T]> {
+    for (let i = 0; i < array.length; ++i) {
+      for (let j = i + 1; j < array.length; ++j) {
+        yield [array[i], array[j]];
+      }
+    }
+  }(array));
+}
