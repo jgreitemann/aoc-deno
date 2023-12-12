@@ -1,3 +1,4 @@
+import { Hasher, HashMap } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 import { Solution } from "../solution.ts";
 import { iter, product, sum, zip } from "../utils/iter.ts";
 
@@ -9,10 +10,11 @@ export default <Solution<Report[]>> {
     );
   },
   part2(reports: Report[]): number {
+    const cache = FlatHashMap.builder<Report, number>();
     return sum(
       reports.map((report) => {
         const { pattern, runs } = unfold(report);
-        return determineCombinations(pattern, runs);
+        return determineCombinations(pattern, runs, cache);
       }),
     );
   },
@@ -138,6 +140,7 @@ export function shiftingRunCombinations(
   pattern: string,
   runs: number[],
   standalone = true,
+  cache = FlatHashMap.builder<Report, number>(),
 ): number {
   function combinationsInRange(
     left: number,
@@ -151,6 +154,12 @@ export function shiftingRunCombinations(
         }
       }
       return 1;
+    }
+
+    const subpattern = pattern.substring(left, right);
+    const cached = cache.get({ pattern: subpattern, runs });
+    if (cached !== undefined) {
+      return cached;
     }
 
     const [run, ...rest] = runs;
@@ -169,6 +178,9 @@ export function shiftingRunCombinations(
 
       count += combinationsInRange(start + run + 1, right, rest);
     }
+
+    cache.set({ pattern: subpattern, runs }, count);
+
     return count;
   }
 
@@ -255,7 +267,15 @@ function binom(n: number, k: number): number {
   return c;
 }
 
-export function determineCombinations(pattern: string, runs: number[]): number {
+const FlatHashMap = HashMap.createContext({
+  hasher: Hasher.anyFlatHasher(),
+});
+
+export function determineCombinations(
+  pattern: string,
+  runs: number[],
+  cache = FlatHashMap.builder<Report, number>(),
+): number {
   const groups = pattern.split(/\.+/).filter((s) => s.length > 0);
 
   return sum(
@@ -267,7 +287,7 @@ export function determineCombinations(pattern: string, runs: number[]): number {
             .map(reduceReport)
             .map(({ pattern, runs }) =>
               tryAllQuestionMarkCombinations(pattern, runs) ??
-                shiftingRunCombinations(pattern, runs, false)
+                shiftingRunCombinations(pattern, runs, false, cache)
             ),
         )
       ),
