@@ -1,10 +1,12 @@
 import { Solution } from "../solution.ts";
-import { iter, sum } from "../utils/iter.ts";
+import { iter, product, sum, zip } from "../utils/iter.ts";
 
 export default <Solution<Report[]>> {
   parse: parseReports,
   part1(reports: Report[]): number {
-    return sum(reports.map(({ pattern, runs }) => combinations(pattern, runs)));
+    return sum(
+      reports.map(({ pattern, runs }) => determineCombinations(pattern, runs)),
+    );
   },
 };
 
@@ -19,6 +21,13 @@ export function parseReports(input: string): Report[] {
     const runs = runsStr.split(",").map((r) => +r);
     return { pattern, runs };
   });
+}
+
+export function unfold(report: Report, repetitions = 5): Report {
+  return {
+    pattern: Array(repetitions).fill(report.pattern).join("?"),
+    runs: Array(repetitions).fill(report.runs).flat(),
+  };
 }
 
 function applyPattern(pattern: string, replacements: string[]): string {
@@ -65,6 +74,58 @@ export function bruteForceCombinations(
     .count();
 }
 
-export function combinations(pattern: string, runs: number[]): number {
-  return bruteForceCombinations(pattern, runs);
+export function runDistributions(
+  groups: string[],
+  runs: number[],
+): number[][][] {
+  const maxRunsByGroup = groups
+    .map((group) =>
+      iter(group)
+        .scan(
+          (last, elem) => elem === "?" ? (last === "." ? "#" : ".") : elem,
+          ".",
+        )
+        .collect() // TODO: Use case for Iter.split
+        .join("")
+        .split(".")
+        .filter((s) => s.length > 0).length
+    );
+
+  function* generateDistributions(
+    maxRunsByGroup: number[],
+    runs: number[],
+  ): Generator<number[][]> {
+    if (sum(maxRunsByGroup) < runs.length) {
+      return;
+    }
+    const [max, ...maxRest] = maxRunsByGroup;
+    if (maxRest.length === 0) {
+      yield [runs];
+    } else {
+      for (let n = 0; n <= Math.min(max, runs.length); ++n) {
+        const slice = runs.slice(0, n);
+        for (const rest of generateDistributions(maxRest, runs.slice(n))) {
+          yield [slice, ...rest];
+        }
+      }
+    }
+  }
+
+  return [...generateDistributions(maxRunsByGroup, runs)];
+}
+
+export function determineCombinations(pattern: string, runs: number[]): number {
+  const groups = pattern.split(/\.+/).filter((s) => s.length > 0);
+
+  return sum(
+    iter(runDistributions(groups, runs))
+      .map((distribution) =>
+        product(
+          zip(groups, distribution)
+            .map(([group, groupRuns]) =>
+              bruteForceCombinations(group, groupRuns)
+            ),
+        )
+      ),
+  );
 }
