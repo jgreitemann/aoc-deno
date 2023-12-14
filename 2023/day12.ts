@@ -91,27 +91,40 @@ export function runDistributions(
         .filter((s) => s.length > 0).length
     );
 
+  const lengthByGroup = groups.map((group) => group.length);
+
   function* generateDistributions(
     maxRunsByGroup: number[],
+    lengthByGroup: number[],
     runs: number[],
   ): Generator<number[][]> {
     if (sum(maxRunsByGroup) < runs.length) {
       return;
     }
     const [max, ...maxRest] = maxRunsByGroup;
+    const [length, ...lengthRest] = lengthByGroup;
     if (maxRest.length === 0) {
       yield [runs];
     } else {
       for (let n = 0; n <= Math.min(max, runs.length); ++n) {
         const slice = runs.slice(0, n);
-        for (const rest of generateDistributions(maxRest, runs.slice(n))) {
+        if (2 * sum(slice) + slice.length > 2 * length + 1) {
+          break;
+        }
+        for (
+          const rest of generateDistributions(
+            maxRest,
+            lengthRest,
+            runs.slice(n),
+          )
+        ) {
           yield [slice, ...rest];
         }
       }
     }
   }
 
-  return [...generateDistributions(maxRunsByGroup, runs)];
+  return [...generateDistributions(maxRunsByGroup, lengthByGroup, runs)];
 }
 
 export function determineCombinations(pattern: string, runs: number[]): number {

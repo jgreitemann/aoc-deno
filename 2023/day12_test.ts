@@ -48,6 +48,13 @@ Deno.test("Distribute runs over groups", () => {
       [[5, 1, 3], []],
     ],
   );
+  assertEquals(
+    runDistributions(["??", "?????", "?"], [3, 1]),
+    [
+      [[], [3], [1]],
+      [[], [3, 1], []],
+    ],
+  );
 });
 
 [
