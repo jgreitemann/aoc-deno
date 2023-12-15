@@ -8,6 +8,14 @@ export default <Solution<Report[]>> {
       reports.map(({ pattern, runs }) => determineCombinations(pattern, runs)),
     );
   },
+  part2(reports: Report[]): number {
+    return sum(
+      reports.map((report) => {
+        const { pattern, runs } = unfold(report);
+        return determineCombinations(pattern, runs);
+      }),
+    );
+  },
 };
 
 export type Report = {
@@ -74,6 +82,47 @@ export function bruteForceCombinations(
     .count();
 }
 
+export function shiftingRunCombinations(
+  pattern: string,
+  runs: number[],
+  standalone = true,
+): number {
+  function combinationsInRange(
+    left: number,
+    right: number,
+    runs: number[],
+  ): number {
+    if (runs.length === 0) {
+      for (let i = left; i < right; ++i) {
+        if (pattern[i] === "#") {
+          return 0;
+        }
+      }
+      return 1;
+    }
+
+    const [run, ...rest] = runs;
+    const length = sum(runs) + rest.length;
+    let count = 0;
+    for (let start = left; start <= right - length; ++start) {
+      if (start > 0 && pattern[start - 1] === "#") {
+        break;
+      }
+      if (standalone && pattern.substring(start, start + run).includes(".")) {
+        continue;
+      }
+      if (pattern[start + run] === "#") {
+        continue;
+      }
+
+      count += combinationsInRange(start + run + 1, right, rest);
+    }
+    return count;
+  }
+
+  return combinationsInRange(0, pattern.length, runs);
+}
+
 export function runDistributions(
   groups: string[],
   runs: number[],
@@ -136,7 +185,7 @@ export function determineCombinations(pattern: string, runs: number[]): number {
         product(
           zip(groups, distribution)
             .map(([group, groupRuns]) =>
-              bruteForceCombinations(group, groupRuns)
+              shiftingRunCombinations(group, groupRuns, false)
             ),
         )
       ),
