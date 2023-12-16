@@ -38,6 +38,58 @@ export function unfold(report: Report, repetitions = 5): Report {
   };
 }
 
+export function reduceReport({ pattern, runs }: Report): Report {
+  while (pattern.length > 0) {
+    if (pattern[0] === ".") {
+      pattern = pattern.replace(/^\.+/, "");
+    }
+    if (pattern[0] === "#") {
+      if (runs.length === 0) {
+        return { pattern: "#", runs: [] };
+      }
+      const [run, ...restRuns] = runs;
+      if (
+        pattern.length >= run &&
+        pattern.substring(1, run).indexOf(".") === -1 &&
+        (pattern.length === run || pattern[run] !== "#")
+      ) {
+        pattern = pattern.substring(run + 1);
+        runs = restRuns;
+      } else {
+        return { pattern: "#", runs: [] };
+      }
+    } else {
+      break;
+    }
+  }
+
+  while (pattern.length > 0) {
+    if (pattern[pattern.length - 1] === ".") {
+      pattern = pattern.replace(/\.+$/, "");
+    }
+    if (pattern[pattern.length - 1] === "#") {
+      if (runs.length === 0) {
+        return { pattern: "#", runs: [] };
+      }
+      const run = runs[runs.length - 1];
+      if (
+        pattern.length >= run &&
+        pattern.substring(pattern.length - 1 - run).indexOf(".") === -1 &&
+        (pattern.length === run || pattern[pattern.length - 1 - run] !== "#")
+      ) {
+        pattern = pattern.substring(0, pattern.length - 1 - run);
+        runs = runs.slice(0, runs.length - 1);
+      } else {
+        return { pattern: "#", runs: [] };
+      }
+    } else {
+      break;
+    }
+  }
+
+  return { pattern, runs };
+}
+
 function applyPattern(pattern: string, replacements: string[]): string {
   return replacements.reduce(
     (pattern, replacement) => pattern.replace("?", replacement),
@@ -211,9 +263,11 @@ export function determineCombinations(pattern: string, runs: number[]): number {
       .map((distribution) =>
         product(
           zip(groups, distribution)
-            .map(([group, groupRuns]) =>
-              tryAllQuestionMarkCombinations(group, groupRuns) ??
-                shiftingRunCombinations(group, groupRuns, false)
+            .map(([pattern, runs]) => ({ pattern, runs }))
+            .map(reduceReport)
+            .map(({ pattern, runs }) =>
+              tryAllQuestionMarkCombinations(pattern, runs) ??
+                shiftingRunCombinations(pattern, runs, false)
             ),
         )
       ),

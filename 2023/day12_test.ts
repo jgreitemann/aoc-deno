@@ -3,6 +3,7 @@ import {
   bruteForceCombinations,
   determineCombinations,
   parseReports,
+  reduceReport,
   Report,
   runDistributions,
   shiftingRunCombinations,
@@ -47,6 +48,44 @@ Deno.test("Report can be unfolded", () => {
     pattern: "???.###????.###????.###????.###????.###",
     runs: [1, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1, 3],
   });
+});
+
+Deno.test("Reduce reports with leading/trailing dots or hashes", () => {
+  assertEquals(reduceReport({ pattern: "#????", runs: [1, 2] }), {
+    pattern: "???",
+    runs: [2],
+  });
+  assertEquals(reduceReport({ pattern: "#????", runs: [2, 1] }), {
+    pattern: "??",
+    runs: [1],
+  });
+  assertEquals(reduceReport({ pattern: "###??", runs: [2, 1] }), {
+    pattern: "#",
+    runs: [],
+  });
+  assertEquals(reduceReport({ pattern: "????#", runs: [2, 1] }), {
+    pattern: "???",
+    runs: [2],
+  });
+  assertEquals(reduceReport({ pattern: "????#", runs: [1, 2] }), {
+    pattern: "??",
+    runs: [1],
+  });
+  assertEquals(reduceReport({ pattern: "#???#", runs: [1, 2] }), {
+    pattern: "",
+    runs: [],
+  });
+  assertEquals(reduceReport({ pattern: "#????#", runs: [1, 2] }), {
+    pattern: "?",
+    runs: [],
+  });
+  assertEquals(
+    reduceReport({
+      pattern: "#?#?#???#???#?#??#",
+      runs: [1, 1, 1, 3, 1, 1, 2],
+    }),
+    { pattern: "??#??", runs: [3] },
+  );
 });
 
 Deno.test("Distribute runs over groups", () => {
@@ -166,6 +205,13 @@ Deno.test("Distribute runs over groups", () => {
   { report: ALL_QUESTION_MARK_REPORTS[7], combinations: 70 },
   { report: ALL_QUESTION_MARK_REPORTS[8], combinations: 1 },
   { report: ALL_QUESTION_MARK_REPORTS[9], combinations: 0 },
+  {
+    report: {
+      pattern: "?????????????????#??????????????????#??????????????????#",
+      runs: [1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 3, 3],
+    },
+    combinations: 1318970,
+  },
 ].forEach(({ report: { pattern, runs }, combinations }) =>
   Deno.test(`Example report: ${pattern} ~ [${runs}] => ${combinations}`, () => {
     assertEquals(determineCombinations(pattern, runs), combinations);
