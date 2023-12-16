@@ -176,6 +176,33 @@ export function runDistributions(
   return [...generateDistributions(maxRunsByGroup, lengthByGroup, runs)];
 }
 
+function tryAllQuestionMarkCombinations(
+  pattern: string,
+  runs: number[],
+): number | undefined {
+  for (let i = 0; i < pattern.length; ++i) {
+    if (pattern[i] !== "?") {
+      return undefined;
+    }
+  }
+
+  // Fast path: Pattern is just question marks so the number of combinations
+  //            can be determined analytically from combinatorics:
+  return binom(pattern.length - sum(runs) + 1, runs.length);
+}
+
+function binom(n: number, k: number): number {
+  if (k < 0 || k > n) {
+    return 0;
+  }
+  k = Math.min(k, n - k);
+  let c = 1;
+  for (let i = 0; i < k; ++i) {
+    c = c * (n - i) / (i + 1);
+  }
+  return c;
+}
+
 export function determineCombinations(pattern: string, runs: number[]): number {
   const groups = pattern.split(/\.+/).filter((s) => s.length > 0);
 
@@ -185,7 +212,8 @@ export function determineCombinations(pattern: string, runs: number[]): number {
         product(
           zip(groups, distribution)
             .map(([group, groupRuns]) =>
-              shiftingRunCombinations(group, groupRuns, false)
+              tryAllQuestionMarkCombinations(group, groupRuns) ??
+                shiftingRunCombinations(group, groupRuns, false)
             ),
         )
       ),
