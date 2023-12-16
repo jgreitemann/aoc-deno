@@ -1,10 +1,21 @@
+import { Hasher, HashMap } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 import { Solution } from "../solution.ts";
-import { iter, sum } from "../utils/iter.ts";
+import { sum } from "../utils/iter.ts";
 
 export default <Solution<Report[]>> {
   parse: parseReports,
   part1(reports: Report[]): number {
-    return sum(reports.map(({ pattern, runs }) => combinations(pattern, runs)));
+    return sum(
+      reports.map(({ pattern, runs }) => determineCombinations(pattern, runs)),
+    );
+  },
+  part2(reports: Report[]): number {
+    return sum(
+      reports.map((report) => {
+        const { pattern, runs } = unfold(report);
+        return determineCombinations(pattern, runs);
+      }),
+    );
   },
 };
 
@@ -21,50 +32,71 @@ export function parseReports(input: string): Report[] {
   });
 }
 
-function applyPattern(pattern: string, replacements: string[]): string {
-  return replacements.reduce(
-    (pattern, replacement) => pattern.replace("?", replacement),
-    pattern,
-  );
+export function unfold(report: Report, repetitions = 5): Report {
+  return {
+    pattern: Array(repetitions).fill(report.pattern).join("?"),
+    runs: Array(repetitions).fill(report.runs).flat(),
+  };
 }
 
-function* arrangements(n: number, k: number): Generator<string[]> {
-  if (n < k || k < 0) {
-    return;
-  } else if (n === k) {
-    yield Array(n).fill("#");
-  } else if (k === 0) {
-    yield Array(n).fill(".");
-  } else {
-    for (const a of arrangements(n - 1, k)) {
-      yield [".", ...a];
+function shiftingRunCombinations(
+  pattern: string,
+  runs: number[],
+  cache = FlatHashMap.builder<Report, number>(),
+): number {
+  function combinationsInRange(
+    left: number,
+    right: number,
+    runs: number[],
+  ): number {
+    if (runs.length === 0) {
+      for (let i = left; i < right; ++i) {
+        if (pattern[i] === "#") {
+          return 0;
+        }
+      }
+      return 1;
     }
-    for (const a of arrangements(n - 1, k - 1)) {
-      yield ["#", ...a];
+
+    const subpattern = pattern.substring(left, right);
+    const cached = cache.get({ pattern: subpattern, runs });
+    if (cached !== undefined) {
+      return cached;
     }
+
+    const [run, ...rest] = runs;
+    const length = sum(runs) + rest.length;
+    let count = 0;
+    for (let start = left; start <= right - length; ++start) {
+      if (start > 0 && pattern[start - 1] === "#") {
+        break;
+      }
+      if (pattern.substring(start, start + run).includes(".")) {
+        continue;
+      }
+      if (pattern[start + run] === "#") {
+        continue;
+      }
+
+      count += combinationsInRange(start + run + 1, right, rest);
+    }
+
+    cache.set({ pattern: subpattern, runs }, count);
+
+    return count;
   }
+
+  return combinationsInRange(0, pattern.length, runs);
 }
 
-function isCompatible(pattern: string, runs: number[]): boolean {
-  const tokens = pattern.split(/\.+/).map((s) => s.length).filter((l) => l > 0);
-  if (tokens.length !== runs.length) {
-    return false;
-  }
-  return tokens.every((t, i) => t === runs[i]);
-}
+const FlatHashMap = HashMap.createContext({
+  hasher: Hasher.anyFlatHasher(),
+});
 
-export function bruteForceCombinations(
+export function determineCombinations(
   pattern: string,
   runs: number[],
 ): number {
-  const hashes = pattern.split("").filter((c) => c === "#").length;
-  const blanks = pattern.split("").filter((c) => c === "?").length;
-  return iter(arrangements(blanks, sum(runs) - hashes))
-    .map((replacements) => applyPattern(pattern, replacements))
-    .filter((p) => isCompatible(p, runs))
-    .count();
-}
-
-export function combinations(pattern: string, runs: number[]): number {
-  return bruteForceCombinations(pattern, runs);
+  const cache = FlatHashMap.builder<Report, number>();
+  return shiftingRunCombinations(pattern, runs, cache);
 }
