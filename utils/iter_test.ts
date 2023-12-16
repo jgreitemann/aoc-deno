@@ -340,15 +340,48 @@ Deno.test("Iter.chunks returns an iterator over non-overlapping subarrays", () =
   assertEquals(iter(primes).chunks(4).collect(), [[2, 3, 5, 7]]);
 });
 
-Deno.test("Iter.chunks throws for non-positive N", () => {
+Deno.test("Iter.chunks throws for N < 1", () => {
   assertThrows(() => iter(primes).chunks(0));
   assertThrows(() => iter(primes).chunks(-3));
+  assertThrows(() => iter(primes).chunks(0.999 as number));
 });
 
 Deno.test("Iter.chunks rounds down for non-integer N", () => {
   assertEquals(
     iter(primes).chunks(Math.PI).collect(),
     iter(primes).chunks(3).collect(),
+  );
+});
+
+Deno.test("Iter.windows returns an iterator over consecutive overlapping subarrays", () => {
+  assertEquals(
+    iter(primes).windows(1).collect(),
+    [[2], [3], [5], [7], [11], [13]],
+  );
+  assertEquals(
+    iter(primes).windows(2).collect(),
+    [[2, 3], [3, 5], [5, 7], [7, 11], [11, 13]],
+  );
+  assertEquals(
+    iter(primes).windows(3).collect(),
+    [[2, 3, 5], [3, 5, 7], [5, 7, 11], [7, 11, 13]],
+  );
+  assertEquals(
+    iter(primes).windows(3).collect(),
+    [[2, 3, 5], [3, 5, 7], [5, 7, 11], [7, 11, 13]],
+  );
+});
+
+Deno.test("Iter.windows throws for N < 1", () => {
+  assertThrows(() => iter(primes).windows(0));
+  assertThrows(() => iter(primes).windows(-3));
+  assertThrows(() => iter(primes).windows(0.999 as number));
+});
+
+Deno.test("Iter.windows rounds down for non-integer N", () => {
+  assertEquals(
+    iter(primes).windows(Math.PI).collect(),
+    iter(primes).windows(3).collect(),
   );
 });
 

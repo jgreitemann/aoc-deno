@@ -196,8 +196,8 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
   }
 
   chunks<N extends number>(n: N): Iter<Tuple<T, N>> {
-    if (n <= 0) {
-      throw new RangeError("Argument to Iter.chunks must be positive");
+    if (n < 1) {
+      throw new RangeError("Argument to Iter.chunks must not be less than one");
     }
     const it = new Iter(this.it);
     return new Iter({
@@ -210,6 +210,32 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
         }
       },
     });
+  }
+
+  windows<N extends number>(n: N): Iter<Tuple<T, N>> {
+    if (n < 1) {
+      throw new RangeError("Argument to Iter.chunks must not be less than one");
+    }
+    const it = new Iter(this.it);
+    const start = it.take(n - 1).collect();
+    if (start.length < Math.floor(n - 1)) {
+      return iter([] as Tuple<T, N>[]);
+    }
+    return new Iter(
+      new class implements Iterator<Tuple<T, N>> {
+        constructor(private prev: T[]) {}
+
+        next(): IteratorResult<Tuple<T, N>> {
+          const { done, value: current } = it.next();
+          if (done) {
+            return { done, value: undefined };
+          }
+          const ret = [...this.prev, current] as Tuple<T, N>;
+          this.prev = ret.slice(1);
+          return { done: false, value: ret };
+        }
+      }(start),
+    );
   }
 
   find(predicate: (elem: T) => boolean): T | undefined {
