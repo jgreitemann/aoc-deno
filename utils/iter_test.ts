@@ -3,7 +3,7 @@ import {
   assertThrows,
 } from "https://deno.land/std@0.201.0/assert/mod.ts";
 
-import { iter, pairs, zip } from "./iter.ts";
+import { iter, pairs, range, zip } from "./iter.ts";
 
 const primes = [2, 3, 5, 7, 11, 13];
 const sum = (acc: number, elem: number) => acc + elem;
@@ -515,4 +515,12 @@ Deno.test("Iterate over all pairs of different elements in an array", () => {
       ["green", "blue"],
     ],
   );
+});
+
+Deno.test("Iterate over a range of integers", () => {
+  assertEquals(range(0, 42).collect(), [...Array(42).keys()].map((k) => +k));
+  assertEquals(range(9, 17).collect(), [9, 10, 11, 12, 13, 14, 15, 16]);
+  assertEquals(range(3, 4).collect(), [3]);
+  assertEquals(range(7, 7).collect(), []);
+  assertEquals(range(6, 3).collect(), []);
 });

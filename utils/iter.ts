@@ -326,3 +326,12 @@ export function pairs<T>(array: T[]): Iter<[T, T]> {
     }
   }(array));
 }
+
+export function range(start: number, end: number): Iter<number> {
+  return new Iter(function* (): Generator<number> {
+    while (start < end) {
+      yield start;
+      ++start;
+    }
+  }());
+}
