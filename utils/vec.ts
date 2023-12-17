@@ -8,6 +8,14 @@ type _Array<T, N extends number, R extends unknown[]> = R["length"] extends N
 
 export type Vector<N extends number> = FixedLengthArray<number, N>;
 
+export const Unit = {
+  NORTH: [-1, 0],
+  WEST: [0, -1],
+  SOUTH: [1, 0],
+  EAST: [0, 1],
+} as const;
+export type Direction = keyof typeof Unit;
+
 export function vectorCompare<N extends number>(
   lhs: Readonly<Vector<N>>,
   rhs: Readonly<Vector<N>>,

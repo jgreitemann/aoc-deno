@@ -1,6 +1,6 @@
 import { Solution } from "../solution.ts";
 import { Iter, iter, range } from "../utils/iter.ts";
-import { Vector, vectorAdd, vectorMul } from "../utils/vec.ts";
+import { Direction, Unit, Vector, vectorAdd, vectorMul } from "../utils/vec.ts";
 
 export default <Solution<Platform>> {
   parse: (input) => new Platform(input),
@@ -15,14 +15,6 @@ export default <Solution<Platform>> {
     return platform.load();
   },
 };
-
-const Unit = {
-  NORTH: [-1, 0],
-  WEST: [0, -1],
-  SOUTH: [1, 0],
-  EAST: [0, 1],
-} as const;
-export type Direction = keyof typeof Unit;
 
 export class Platform {
   map: string[][];
