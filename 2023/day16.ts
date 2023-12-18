@@ -20,7 +20,7 @@ export default <Solution<Tile[][]>> {
 };
 
 type Ray = {
-  pos: Vector<2>;
+  pos: Readonly<Vector<2>>;
   dir: Direction;
 };
 
@@ -72,7 +72,7 @@ function propagate(ray: Ray, map: Tile[][]): Ray[] {
 export function energizedTiles(
   map: Tile[][],
   start: Ray = { pos: [0, 0], dir: "EAST" },
-): HashSet<Vector<2>> {
+): HashSet<Readonly<Vector<2>>> {
   const width = map[0].length;
   const height = map.length;
 

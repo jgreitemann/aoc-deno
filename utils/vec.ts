@@ -31,7 +31,7 @@ export function vectorCompare<N extends number>(
 export function vectorAdd<N extends number>(
   lhs: Readonly<Vector<N>>,
   rhs: Readonly<Vector<N>>,
-): Vector<N> {
+): Readonly<Vector<N>> {
   const res = [...lhs] as Vector<N>;
   for (const i in res) {
     res[i] += rhs[i];
@@ -42,7 +42,7 @@ export function vectorAdd<N extends number>(
 export function vectorSub<N extends number>(
   lhs: Readonly<Vector<N>>,
   rhs: Readonly<Vector<N>>,
-): Vector<N> {
+): Readonly<Vector<N>> {
   const res = [...lhs] as Vector<N>;
   for (const i in res) {
     res[i] -= rhs[i];
@@ -53,6 +53,6 @@ export function vectorSub<N extends number>(
 export function vectorMul<N extends number>(
   vec: Readonly<Vector<N>>,
   scalar: number,
-): Vector<N> {
-  return vec.map((elem) => elem * scalar) as Vector<N>;
+): Readonly<Vector<N>> {
+  return vec.map((elem) => elem * scalar) as Readonly<Vector<N>>;
 }

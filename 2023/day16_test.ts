@@ -26,7 +26,10 @@ const EXAMPLE_ENERGIZED = `######....
 .#######..
 .#...#.#..`;
 
-function render(energized: Iterable<Vector<2>>, map: Tile[][]): string {
+function render(
+  energized: Iterable<Readonly<Vector<2>>>,
+  map: Tile[][],
+): string {
   const rendering = map.map((row) => row.map((_) => "."));
   for (const [row, col] of energized) {
     rendering[row][col] = "#";

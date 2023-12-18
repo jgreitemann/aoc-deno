@@ -22,7 +22,7 @@ export default <Solution<number[][]>> {
 };
 
 type State = {
-  pos: Vector<2>;
+  pos: Readonly<Vector<2>>;
   axis: Axis;
 };
 
@@ -94,7 +94,10 @@ function precalculateRules(min: number, max: number): MovementRules {
   };
 }
 
-function neighbors({ pos, axis }: State, rules: MovementRules): Vector<2>[][] {
+function neighbors(
+  { pos, axis }: State,
+  rules: MovementRules,
+): Readonly<Vector<2>>[][] {
   return rules[axis]
     .map((deltas) => deltas.map((delta) => vectorAdd<2>(pos, delta)));
 }

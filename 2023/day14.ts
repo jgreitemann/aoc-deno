@@ -34,7 +34,7 @@ export class Platform {
     ];
   }
 
-  inBounds([row, col]: Vector<2>): boolean {
+  inBounds([row, col]: Readonly<Vector<2>>): boolean {
     return row >= 0 && col >= 0 && row < this.map.length &&
       col < this.map[row].length;
   }
@@ -53,7 +53,10 @@ export class Platform {
     }
   }
 
-  *line(start: Vector<2>, incr: Readonly<Vector<2>>): Generator<Vector<2>> {
+  *line(
+    start: Readonly<Vector<2>>,
+    incr: Readonly<Vector<2>>,
+  ): Generator<Readonly<Vector<2>>> {
     while (this.inBounds(start)) {
       yield start;
       start = vectorAdd<2>(start, incr);

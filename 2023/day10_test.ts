@@ -1,5 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
-import { enclosedPoints, Point, traceLoop } from "./day10.ts";
+import { Point, traceLoop } from "./day10.ts";
+import { enclosedPoints } from "../utils/topology.ts";
 
 const SIMPLE_EXAMPLE_PIPES = [
   "-L|F7",
@@ -112,22 +113,22 @@ Deno.test("Complex loop path is traced out and annotated with distance from star
 });
 
 Deno.test("Point enclosed by the loop are identified", () => {
-  assertEquals(enclosedPoints(SIMPLE_LOOP_POINTS), [[2, 2]]);
-  assertEquals(enclosedPoints(COMPLEX_LOOP_POINTS), [[2, 2]]);
+  assertEquals(enclosedPoints(SIMPLE_LOOP_POINTS).toArray(), [[2, 2]]);
+  assertEquals(enclosedPoints(COMPLEX_LOOP_POINTS).toArray(), [[2, 2]]);
   assertEquals(
-    enclosedPoints(traceLoop(PIPE_INTERIOR_GAP)).sort(),
+    enclosedPoints(traceLoop(PIPE_INTERIOR_GAP)).toArray().sort(),
     interiorPoints(PIPE_INTERIOR_GAP),
   );
   assertEquals(
-    enclosedPoints(traceLoop(PIPE_INTERIOR_NO_GAP)).sort(),
+    enclosedPoints(traceLoop(PIPE_INTERIOR_NO_GAP)).toArray().sort(),
     interiorPoints(PIPE_INTERIOR_NO_GAP),
   );
   assertEquals(
-    enclosedPoints(traceLoop(PIPE_INTERIOR_BULK)).sort(),
+    enclosedPoints(traceLoop(PIPE_INTERIOR_BULK)).toArray().sort(),
     interiorPoints(PIPE_INTERIOR_BULK),
   );
   assertEquals(
-    enclosedPoints(traceLoop(MESSY_PIPE_INTERIOR)).sort(),
+    enclosedPoints(traceLoop(MESSY_PIPE_INTERIOR)).toArray().sort(),
     interiorPoints(MESSY_PIPE_INTERIOR),
   );
 });
