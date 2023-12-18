@@ -335,3 +335,11 @@ export function range(start: number, end: number): Iter<number> {
     }
   }());
 }
+
+export function repeat<T>(elem: T, times: number): Iter<T> {
+  return new Iter(function* () {
+    for (let i = 0; i < times; ++i) {
+      yield elem;
+    }
+  }());
+}
