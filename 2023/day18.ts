@@ -1,14 +1,18 @@
 import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 import { Solution } from "../solution.ts";
-import { Direction, Unit, Vector, vectorAdd } from "../utils/vec.ts";
-import { iter, repeat } from "../utils/iter.ts";
+import { Direction, Unit, Vector, vectorAdd, vectorMul } from "../utils/vec.ts";
+import { iter, repeat, sum, zip } from "../utils/iter.ts";
 import { enclosedPoints } from "../utils/topology.ts";
 
-export default <Solution<Step[]>> {
-  parse: parseSteps,
+export default <Solution<string>> {
+  parse: (input) => input,
 
-  part1(steps: Step[]): number {
-    return lagoon(steps).size;
+  part1(input: string): number {
+    return lagoon(followSteps(parseSteps(input))).size;
+  },
+
+  part2(input: string): number {
+    return findRealLagoonArea(parseColorSteps(input));
   },
 };
 
@@ -18,10 +22,10 @@ export type Step = {
 };
 
 const DirMap: Record<string, Direction> = {
-  U: "NORTH",
-  L: "WEST",
-  D: "SOUTH",
   R: "EAST",
+  D: "SOUTH",
+  L: "WEST",
+  U: "NORTH",
 };
 
 export function parseSteps(input: string): Step[] {
@@ -37,16 +41,94 @@ export function parseSteps(input: string): Step[] {
     });
 }
 
-export function followSteps(steps: Step[]): Readonly<Vector<2>>[] {
+export function parseColorSteps(input: string): Step[] {
+  const dirArray = [...Object.values(DirMap)];
+  return [...input.matchAll(/#([0-9a-f]{5})([0-9a-f])/g)]
+    .map(([_, hexStride, hexDir]) => ({
+      direction: dirArray[+hexDir],
+      stride: parseInt(hexStride, 16),
+    }));
+}
+
+export function followSteps(
+  steps: Step[],
+  start: Readonly<Vector<2>> = [0, 0],
+): Readonly<Vector<2>>[] {
   return iter(steps)
     .flatMap(({ direction, stride }) => repeat(Unit[direction], stride))
-    .scan(vectorAdd<2>, [0, 0] as Readonly<Vector<2>>)
+    .scan(vectorAdd<2>, start)
     .collect();
 }
 
-export function lagoon(steps: Step[]): HashSet<Readonly<Vector<2>>> {
-  const loop = followSteps(steps);
+export function lagoon(
+  loop: Readonly<Vector<2>>[],
+): HashSet<Readonly<Vector<2>>> {
   const loopSet = HashSet.from(loop);
   const interior = enclosedPoints(loop);
   return loopSet.union(interior);
+}
+
+export type Distortion = {
+  start: Readonly<Vector<2>>;
+  distortedSteps: Step[];
+  rowScaling: number[];
+  colScaling: number[];
+};
+
+export function distortSteps(steps: Step[]): Distortion {
+  const vertices = [
+    [0, 0] as const,
+    ...iter(steps)
+      .map(({ direction, stride }) => vectorMul<2>(Unit[direction], stride))
+      .scan(
+        (current, delta) => vectorAdd<2>(current, delta),
+        [0, 0] as Readonly<Vector<2>>,
+      ),
+  ];
+
+  const rowMapping = iter(
+    vertices
+      .map(([row, _]) => row)
+      .sort((lhs, rhs) => lhs - rhs),
+  )
+    .dedup()
+    .collect();
+  const colMapping = iter(
+    vertices
+      .map(([_, col]) => col)
+      .sort((lhs, rhs) => lhs - rhs),
+  )
+    .dedup()
+    .collect();
+
+  const distortedVertices = vertices
+    .map(([row, col]) => [rowMapping.indexOf(row), colMapping.indexOf(col)]);
+
+  return {
+    start: [2 * rowMapping.indexOf(0), 2 * colMapping.indexOf(0)],
+    distortedSteps: zip(steps, iter(distortedVertices).windows(2))
+      .map(([step, [from, to]]) => ({
+        direction: step.direction,
+        stride: 2 * (Math.abs(to[0] - from[0]) + Math.abs(to[1] - from[1])),
+      }))
+      .collect(),
+    rowScaling: [
+      1,
+      ...iter(rowMapping).windows(2).flatMap(([l, r]) => [r - l - 1, 1]),
+    ],
+    colScaling: [
+      1,
+      ...iter(colMapping).windows(2).flatMap(([l, r]) => [r - l - 1, 1]),
+    ],
+  };
+}
+
+export function findRealLagoonArea(steps: Step[]): number {
+  const { start, distortedSteps, rowScaling, colScaling } = distortSteps(steps);
+  const distortedLagoon = lagoon(followSteps(distortedSteps, start));
+
+  return sum(
+    distortedLagoon.stream()
+      .map(([row, col]) => rowScaling[row] * colScaling[col]),
+  );
 }
