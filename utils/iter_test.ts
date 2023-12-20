@@ -415,15 +415,11 @@ Deno.test("Iter.duplicates can be used with a custom comparator", () => {
 });
 
 Deno.test("Iter.dedup removes consecutive duplicates", () => {
-  assertEquals(iter([1, 2, 2, 2, 3, 3, 4, 5, 2, 2, 3]).dedup().collect(), [
-    1,
-    2,
-    3,
-    4,
-    5,
-    2,
-    3,
-  ]);
+  assertEquals(
+    iter([1, 2, 2, 2, 3, 3, 4, 5, 2, 2, 3]).dedup().collect(),
+    [1, 2, 3, 4, 5, 2, 3],
+  );
+  assertEquals(iter([0, 0, 1, 1, 2, 2, 3, 3]).dedup().collect(), [0, 1, 2, 3]);
 });
 
 Deno.test("Iter.dedup uses strict equality comparison by default", () => {

@@ -272,7 +272,7 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
     return new Iter(function* (it: Iterable<T>): Generator<T> {
       let prev: T | undefined = undefined;
       for (const elem of it) {
-        if (!prev || !compare(prev, elem)) {
+        if (prev === undefined || !compare(prev, elem)) {
           yield elem;
         }
         prev = elem;
