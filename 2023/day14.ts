@@ -1,5 +1,6 @@
 import { Solution } from "../solution.ts";
 import { Iter, iter, range } from "../utils/iter.ts";
+import { inBounds } from "../utils/topology.ts";
 import {
   Direction,
   Point,
@@ -41,9 +42,8 @@ export class Platform {
     ];
   }
 
-  inBounds([row, col]: Point): boolean {
-    return row >= 0 && col >= 0 && row < this.map.length &&
-      col < this.map[row].length;
+  inBounds(p: Point): boolean {
+    return inBounds(p, this.map);
   }
 
   edge(dir: Direction): Iter<Point> {

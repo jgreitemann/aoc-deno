@@ -1,17 +1,23 @@
 import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
-import { Vector, vectorAdd, vectorSub } from "./vec.ts";
+import { Point, vectorAdd, vectorSub } from "./vec.ts";
 import { sum, zip } from "./iter.ts";
 
-function* neighbors(p: Readonly<Vector<2>>): Generator<Readonly<Vector<2>>> {
+export function* neighbors(
+  p: Point,
+): Generator<Point> {
   yield [p[0] - 1, p[1]];
   yield [p[0], p[1] - 1];
   yield [p[0] + 1, p[1]];
   yield [p[0], p[1] + 1];
 }
 
+export function inBounds<T>([row, col]: Point, map: ArrayLike<T>[]): boolean {
+  return row >= 0 && col >= 0 && row < map.length && col < map[row].length;
+}
+
 export function enclosedPoints(
-  loop: Readonly<Vector<2>>[],
-): HashSet<Readonly<Vector<2>>> {
+  loop: Point[],
+): HashSet<Point> {
   const winding = Math.sign(sum(
     zip(loop, [...loop.slice(1), loop[0]])
       .map(([[x1, y1], [x2, y2]]) => (x2 - x1) * (y2 + y1)),
@@ -26,7 +32,7 @@ export function enclosedPoints(
     .filter((p) => !loopSet.has(p))
     .collect();
 
-  const interior = HashSet.builder<Readonly<Vector<2>>>();
+  const interior = HashSet.builder<Point>();
   while (seeds.length > 0) {
     seeds = seeds.flatMap((seed) => {
       if (!loopSet.has(seed) && interior.add(seed)) {
