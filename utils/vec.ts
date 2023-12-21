@@ -1,3 +1,5 @@
+import { iter } from "./iter.ts";
+
 type FixedLengthArray<T, N extends number> = N extends N
   ? (number extends N ? T[] : _Array<T, N, []>)
   : never;
@@ -55,4 +57,18 @@ export function vectorMul<N extends number>(
   scalar: number,
 ): Readonly<Vector<N>> {
   return vec.map((elem) => elem * scalar) as Readonly<Vector<N>>;
+}
+
+export function findStart(map: string[], startChar = "S"): Readonly<Vector<2>> {
+  const start: Readonly<Vector<2>> | undefined = iter(map)
+    .findMap((line, row) => {
+      const col = line.indexOf(startChar);
+      return col >= 0 ? [row, col] : undefined;
+    });
+
+  if (start === undefined) {
+    throw new Error("Starting position could not be found");
+  }
+
+  return start;
 }

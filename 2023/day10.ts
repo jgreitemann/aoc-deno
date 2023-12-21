@@ -1,6 +1,6 @@
 import { Solution } from "../solution.ts";
 import { enclosedPoints } from "../utils/topology.ts";
-import { Vector, vectorAdd } from "../utils/vec.ts";
+import { findStart, Vector, vectorAdd } from "../utils/vec.ts";
 
 import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 
@@ -51,10 +51,7 @@ function invert(direction: Direction): Direction {
 }
 
 export function traceLoop(pipes: string[]): Readonly<Point>[] {
-  // TODO: Use case for Iter.findMap
-  const startRow = pipes.findIndex((row) => row.includes("S"));
-  const startCol = pipes[startRow].indexOf("S");
-  const start: Readonly<Point> = [startRow, startCol];
+  const start = findStart(pipes);
 
   const loop: Readonly<Point>[] = [];
   const loopBuilder = HashSet.builder<Readonly<Point>>();
