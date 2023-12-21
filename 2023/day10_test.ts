@@ -1,6 +1,7 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
-import { Point, traceLoop } from "./day10.ts";
+import { traceLoop } from "./day10.ts";
 import { enclosedPoints } from "../utils/topology.ts";
+import { Point } from "../utils/vec.ts";
 
 const SIMPLE_EXAMPLE_PIPES = [
   "-L|F7",

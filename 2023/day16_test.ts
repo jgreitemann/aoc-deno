@@ -1,6 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
-import { Vector } from "../utils/vec.ts";
 import { energizedTiles, mostEnergizedTiles, Tile } from "./day16.ts";
+import { Point } from "../utils/vec.ts";
 
 const EXAMPLE_MAP: Tile[][] = [
   ".|...\\....".split("") as Tile[],
@@ -27,7 +27,7 @@ const EXAMPLE_ENERGIZED = `######....
 .#...#.#..`;
 
 function render(
-  energized: Iterable<Readonly<Vector<2>>>,
+  energized: Iterable<Point>,
   map: Tile[][],
 ): string {
   const rendering = map.map((row) => row.map((_) => "."));

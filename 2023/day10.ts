@@ -1,6 +1,6 @@
 import { Solution } from "../solution.ts";
 import { enclosedPoints } from "../utils/topology.ts";
-import { findStart, Vector, vectorAdd } from "../utils/vec.ts";
+import { findStart, Point, vectorAdd } from "../utils/vec.ts";
 
 import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 
@@ -15,8 +15,6 @@ export default <Solution<string[]>> {
     return enclosedPoints(traceLoop(pipes)).size;
   },
 };
-
-export type Point = Vector<2>;
 
 const NORTH = [-1, 0] as const;
 const WEST = [0, -1] as const;
@@ -50,11 +48,11 @@ function invert(direction: Direction): Direction {
   throw new Error("unreachable");
 }
 
-export function traceLoop(pipes: string[]): Readonly<Point>[] {
+export function traceLoop(pipes: string[]): Point[] {
   const start = findStart(pipes);
 
-  const loop: Readonly<Point>[] = [];
-  const loopBuilder = HashSet.builder<Readonly<Point>>();
+  const loop: Point[] = [];
+  const loopBuilder = HashSet.builder<Point>();
 
   let looseEnds = [start];
   for (let distance = 0; looseEnds.length > 0; ++distance) {

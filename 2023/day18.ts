@@ -1,6 +1,6 @@
 import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 import { Solution } from "../solution.ts";
-import { Direction, Unit, Vector, vectorAdd, vectorMul } from "../utils/vec.ts";
+import { Direction, Point, Unit, vectorAdd, vectorMul } from "../utils/vec.ts";
 import { iter, repeat, sum, zip } from "../utils/iter.ts";
 import { enclosedPoints } from "../utils/topology.ts";
 
@@ -52,8 +52,8 @@ export function parseColorSteps(input: string): Step[] {
 
 export function followSteps(
   steps: Step[],
-  start: Readonly<Vector<2>> = [0, 0],
-): Readonly<Vector<2>>[] {
+  start: Point = [0, 0],
+): Point[] {
   return iter(steps)
     .flatMap(({ direction, stride }) => repeat(Unit[direction], stride))
     .scan(vectorAdd<2>, start)
@@ -61,15 +61,15 @@ export function followSteps(
 }
 
 export function lagoon(
-  loop: Readonly<Vector<2>>[],
-): HashSet<Readonly<Vector<2>>> {
+  loop: Point[],
+): HashSet<Point> {
   const loopSet = HashSet.from(loop);
   const interior = enclosedPoints(loop);
   return loopSet.union(interior);
 }
 
 export type Distortion = {
-  start: Readonly<Vector<2>>;
+  start: Point;
   distortedSteps: Step[];
   rowScaling: number[];
   colScaling: number[];
@@ -82,7 +82,7 @@ export function distortSteps(steps: Step[]): Distortion {
       .map(({ direction, stride }) => vectorMul<2>(Unit[direction], stride))
       .scan(
         (current, delta) => vectorAdd<2>(current, delta),
-        [0, 0] as Readonly<Vector<2>>,
+        [0, 0] as Point,
       ),
   ];
 

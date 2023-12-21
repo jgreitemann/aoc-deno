@@ -1,7 +1,7 @@
 import { Solution } from "../solution.ts";
 
 import { iter, product, sum } from "../utils/iter.ts";
-import { Vector } from "../utils/vec.ts";
+import { Point } from "../utils/vec.ts";
 
 import {
   Hasher,
@@ -22,8 +22,6 @@ export default <Solution<Schematic>> {
 const FlatHashMap = HashMap.createContext({
   hasher: Hasher.anyFlatHasher(),
 });
-
-export type Point = Vector<2>;
 
 export type Schematic = {
   numbers: Map<Point, string>;

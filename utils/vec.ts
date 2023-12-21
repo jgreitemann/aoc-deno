@@ -10,6 +10,8 @@ type _Array<T, N extends number, R extends unknown[]> = R["length"] extends N
 
 export type Vector<N extends number> = FixedLengthArray<number, N>;
 
+export type Point = Readonly<Vector<2>>;
+
 export const Unit = {
   NORTH: [-1, 0],
   WEST: [0, -1],

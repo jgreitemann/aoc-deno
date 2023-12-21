@@ -1,6 +1,6 @@
 import { Hasher, HashMap } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 import { Solution } from "../solution.ts";
-import { Vector, vectorAdd } from "../utils/vec.ts";
+import { Point, vectorAdd } from "../utils/vec.ts";
 import { range, sum } from "../utils/iter.ts";
 
 enum Axis {
@@ -22,7 +22,7 @@ export default <Solution<number[][]>> {
 };
 
 type State = {
-  pos: Readonly<Vector<2>>;
+  pos: Point;
   axis: Axis;
 };
 
@@ -65,7 +65,7 @@ export function minHeatLoss(rules: MovementRules) {
         );
     }
 
-    const targetPos: Vector<2> = [height - 1, width - 1];
+    const targetPos: Point = [height - 1, width - 1];
     return Math.min(
       minLoss.get({ pos: targetPos, axis: Axis.Horizontal })!,
       minLoss.get({ pos: targetPos, axis: Axis.Vertical })!,
@@ -74,7 +74,7 @@ export function minHeatLoss(rules: MovementRules) {
 }
 
 type MovementRules = {
-  [axis in Axis]: readonly (readonly Readonly<Vector<2>>[])[];
+  [axis in Axis]: readonly (readonly Point[])[];
 };
 
 function precalculateRules(min: number, max: number): MovementRules {
@@ -97,7 +97,7 @@ function precalculateRules(min: number, max: number): MovementRules {
 function neighbors(
   { pos, axis }: State,
   rules: MovementRules,
-): Readonly<Vector<2>>[][] {
+): Point[][] {
   return rules[axis]
     .map((deltas) => deltas.map((delta) => vectorAdd<2>(pos, delta)));
 }

@@ -1,8 +1,7 @@
 import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 
 import { Solution } from "../solution.ts";
-import { Direction, Unit, vectorAdd } from "../utils/vec.ts";
-import { Vector } from "../utils/vec.ts";
+import { Direction, Point, Unit, vectorAdd } from "../utils/vec.ts";
 import { range } from "../utils/iter.ts";
 
 export default <Solution<Tile[][]>> {
@@ -20,7 +19,7 @@ export default <Solution<Tile[][]>> {
 };
 
 type Ray = {
-  pos: Readonly<Vector<2>>;
+  pos: Point;
   dir: Direction;
 };
 
@@ -72,7 +71,7 @@ function propagate(ray: Ray, map: Tile[][]): Ray[] {
 export function energizedTiles(
   map: Tile[][],
   start: Ray = { pos: [0, 0], dir: "EAST" },
-): HashSet<Readonly<Vector<2>>> {
+): HashSet<Point> {
   const width = map[0].length;
   const height = map.length;
 

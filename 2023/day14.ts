@@ -1,6 +1,13 @@
 import { Solution } from "../solution.ts";
 import { Iter, iter, range } from "../utils/iter.ts";
-import { Direction, Unit, Vector, vectorAdd, vectorMul } from "../utils/vec.ts";
+import {
+  Direction,
+  Point,
+  Unit,
+  Vector,
+  vectorAdd,
+  vectorMul,
+} from "../utils/vec.ts";
 
 export default <Solution<Platform>> {
   parse: (input) => new Platform(input),
@@ -34,12 +41,12 @@ export class Platform {
     ];
   }
 
-  inBounds([row, col]: Readonly<Vector<2>>): boolean {
+  inBounds([row, col]: Point): boolean {
     return row >= 0 && col >= 0 && row < this.map.length &&
       col < this.map[row].length;
   }
 
-  edge(dir: Direction): Iter<Vector<2>> {
+  edge(dir: Direction): Iter<Point> {
     const [height, width] = this.dimensions();
     switch (dir) {
       case "NORTH":
@@ -54,9 +61,9 @@ export class Platform {
   }
 
   *line(
-    start: Readonly<Vector<2>>,
-    incr: Readonly<Vector<2>>,
-  ): Generator<Readonly<Vector<2>>> {
+    start: Point,
+    incr: Point,
+  ): Generator<Point> {
     while (this.inBounds(start)) {
       yield start;
       start = vectorAdd<2>(start, incr);

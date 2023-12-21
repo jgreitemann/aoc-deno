@@ -9,9 +9,9 @@ import {
   parseSteps,
   Step,
 } from "./day18.ts";
-import { Vector } from "../utils/vec.ts";
 import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 import { range } from "../utils/iter.ts";
+import { Point } from "../utils/vec.ts";
 
 const EXAMPLE_INPUT = `R 6 (#70c710)
 D 5 (#0dc571)
@@ -122,7 +122,7 @@ const SIMPLE_WIDE_DISTORTION: Distortion = {
   colScaling: [1, 999, 1, 999, 1, 999, 1],
 };
 
-function render(mapStr: string): HashSet<Readonly<Vector<2>>> {
+function render(mapStr: string): HashSet<Point> {
   const map = mapStr.split("\n");
 
   return HashSet.from(
