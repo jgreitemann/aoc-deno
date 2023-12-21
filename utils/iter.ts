@@ -242,6 +242,20 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
     return this.filter(predicate).first();
   }
 
+  findMap<U>(
+    callback: (elem: T, index: number) => U | undefined,
+  ): U | undefined {
+    let index = 0;
+    for (const elem of this) {
+      const mapped = callback(elem, index);
+      if (mapped !== undefined) {
+        return mapped;
+      }
+      index += 1;
+    }
+    return undefined;
+  }
+
   duplicates(compare = strictEqualityCompare<T>): Iter<T> {
     type ScanState = {
       occurrences: { firstOccurrence: T; isFresh: boolean }[];

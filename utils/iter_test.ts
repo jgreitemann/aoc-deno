@@ -330,6 +330,24 @@ Deno.test("Iter.find returns the first element satisfying the predicate", () => 
   assertEquals(iter([2, 3, 4, 5, 6, 7]).find(isNotPrime), 4);
 });
 
+Deno.test("Iter.findMap returns the first defined mapped value", () => {
+  assertEquals(
+    iter(primes).findMap((elem) => elem >= 10 ? elem.toString() : undefined),
+    "11",
+  );
+});
+
+Deno.test("Iter.findMap provides the index as the second element to the callback", () => {
+  assertEquals(
+    iter(primes).findMap((elem, index) => elem >= 10 ? index : undefined),
+    primes.findIndex((elem) => elem >= 10),
+  );
+});
+
+Deno.test("Iter.findMap returns undefined if no value maps to a defined value", () => {
+  assertEquals(iter(primes).findMap(() => undefined), undefined);
+});
+
 Deno.test("Iter.chunks returns an iterator over non-overlapping subarrays", () => {
   assertEquals(
     iter(primes).chunks(1).collect(),
