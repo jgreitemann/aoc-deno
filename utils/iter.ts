@@ -108,10 +108,12 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
     }(this));
   }
 
-  filterMap<U>(callback: (elem: T) => U | undefined): Iter<U> {
+  filterMap<U>(callback: (elem: T, index: number) => U | undefined): Iter<U> {
     return new Iter(function* (it: Iterable<T>): Generator<U> {
+      let index = 0;
       for (const elem of it) {
-        const mapped = callback(elem);
+        const mapped = callback(elem, index);
+        index += 1;
         if (mapped !== undefined) {
           yield mapped;
         }
