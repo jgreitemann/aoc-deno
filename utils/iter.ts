@@ -4,6 +4,10 @@ export function iter<T>(it: Iterable<T>) {
   return new Iter(it[Symbol.iterator]());
 }
 
+export type Predicate<T> =
+  | [(elem: T) => boolean]
+  | (T extends boolean ? [] : never);
+
 export class Iter<T> implements Iterator<T>, Iterable<T> {
   constructor(private it: Iterator<T>) {}
 
@@ -44,7 +48,16 @@ export class Iter<T> implements Iterator<T>, Iterable<T> {
     return false;
   }
 
-  all(predicate: (elem: T) => boolean): boolean {
+  all(...predicateArgs: Predicate<T>): boolean {
+    const [predicate] = predicateArgs;
+    if (predicate === undefined) {
+      for (const elem of this) {
+        if (!elem) {
+          return false;
+        }
+      }
+      return true;
+    }
     for (const elem of this) {
       if (!predicate(elem)) {
         return false;
