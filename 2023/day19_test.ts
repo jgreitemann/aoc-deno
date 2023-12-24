@@ -1,7 +1,9 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
 import {
   isPartAccepted,
+  numberOfAcceptableParts,
   parseInput,
+  splitInterval,
   totalRatingOfAcceptedParts,
   Workflow,
 } from "./day19.ts";
@@ -187,4 +189,60 @@ Deno.test("Sum of accepted part ratings is calculated", () => {
     }),
     19114,
   );
+});
+
+Deno.test("Intervals are split according to threshold", () => {
+  const wholeInterval = { start: 4, end: 9 };
+  assertEquals(splitInterval(wholeInterval, "<", 3), [
+    undefined,
+    wholeInterval,
+  ]);
+  assertEquals(splitInterval(wholeInterval, "<", 4), [
+    undefined,
+    wholeInterval,
+  ]);
+  assertEquals(splitInterval(wholeInterval, "<", 5), [
+    { start: 4, end: 5 },
+    { start: 5, end: 9 },
+  ]);
+  assertEquals(splitInterval(wholeInterval, "<", 8), [
+    { start: 4, end: 8 },
+    { start: 8, end: 9 },
+  ]);
+  assertEquals(splitInterval(wholeInterval, "<", 9), [
+    wholeInterval,
+    undefined,
+  ]);
+  assertEquals(splitInterval(wholeInterval, "<", 10), [
+    wholeInterval,
+    undefined,
+  ]);
+  assertEquals(splitInterval(wholeInterval, ">", 3), [
+    wholeInterval,
+    undefined,
+  ]);
+  assertEquals(splitInterval(wholeInterval, ">", 4), [
+    { start: 5, end: 9 },
+    { start: 4, end: 5 },
+  ]);
+  assertEquals(splitInterval(wholeInterval, ">", 5), [
+    { start: 6, end: 9 },
+    { start: 4, end: 6 },
+  ]);
+  assertEquals(splitInterval(wholeInterval, ">", 8), [
+    undefined,
+    wholeInterval,
+  ]);
+  assertEquals(splitInterval(wholeInterval, ">", 9), [
+    undefined,
+    wholeInterval,
+  ]);
+  assertEquals(splitInterval(wholeInterval, ">", 10), [
+    undefined,
+    wholeInterval,
+  ]);
+});
+
+Deno.test("Number of acceptable part ratings is determined", () => {
+  assertEquals(numberOfAcceptableParts(EXAMPLE_WORKFLOWS), 167409079868000);
 });
