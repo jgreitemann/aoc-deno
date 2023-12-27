@@ -25,6 +25,7 @@ export function takeStep(
   possiblePositions: Iterable<Point>,
   map: string[],
   bcond: BoundaryCondition,
+  prevPositions: HashSet<Point> = HashSet.empty(),
 ): HashSet<Point> {
   const predicate = bcond === "periodic"
     ? (n: Point) => {
@@ -35,7 +36,8 @@ export function takeStep(
   return HashSet.from(
     iter(possiblePositions)
       .flatMap(neighbors)
-      .filter(predicate),
+      .filter(predicate)
+      .filter((n) => !prevPositions.has(n)),
   );
 }
 
@@ -45,9 +47,21 @@ export function takeManySteps(
   map: string[],
   bcond: BoundaryCondition,
 ): HashSet<Point> {
+  let prevPrevPossibilities: HashSet<Point> = HashSet.empty();
+  let prevPossibilities: HashSet<Point> = HashSet.empty();
   let currentPossibilities: HashSet<Point> = HashSet.of(start);
   for (let i = 0; i < n; ++i) {
-    currentPossibilities = takeStep(currentPossibilities, map, bcond);
+    const combinedPossibilities = prevPrevPossibilities.union(
+      currentPossibilities,
+    );
+    prevPrevPossibilities = prevPossibilities;
+    currentPossibilities = takeStep(
+      currentPossibilities,
+      map,
+      bcond,
+      prevPossibilities,
+    );
+    prevPossibilities = combinedPossibilities;
   }
-  return currentPossibilities;
+  return prevPrevPossibilities.union(currentPossibilities);
 }
