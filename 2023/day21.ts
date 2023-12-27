@@ -10,18 +10,32 @@ export default <Solution<string[]>> {
   },
 
   part1(map: string[]): number {
-    return takeManySteps(64, findStart(map), map).size;
+    return takeManySteps(64, findStart(map), map, "open").size;
   },
 };
+
+type BoundaryCondition = "open" | "periodic";
+
+function posMod(x: number, length: number): number {
+  const mod = x % length;
+  return mod < 0 ? mod + length : mod;
+}
 
 export function takeStep(
   possiblePositions: Iterable<Point>,
   map: string[],
+  bcond: BoundaryCondition,
 ): HashSet<Point> {
+  const predicate = bcond === "periodic"
+    ? (n: Point) => {
+      const row = map[posMod(n[0], map.length)];
+      return row[posMod(n[1], row.length)] !== "#";
+    }
+    : (n: Point) => inBounds(n, map) && map[n[0]][n[1]] !== "#";
   return HashSet.from(
     iter(possiblePositions)
       .flatMap(neighbors)
-      .filter((n) => inBounds(n, map) && map[n[0]][n[1]] !== "#"),
+      .filter(predicate),
   );
 }
 
@@ -29,10 +43,11 @@ export function takeManySteps(
   n: number,
   start: Point,
   map: string[],
+  bcond: BoundaryCondition,
 ): HashSet<Point> {
   let currentPossibilities: HashSet<Point> = HashSet.of(start);
   for (let i = 0; i < n; ++i) {
-    currentPossibilities = takeStep(currentPossibilities, map);
+    currentPossibilities = takeStep(currentPossibilities, map, bcond);
   }
   return currentPossibilities;
 }
