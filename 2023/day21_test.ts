@@ -1,6 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
 import { findStart, Point } from "../utils/vec.ts";
-import { takeManySteps, takeStep } from "./day21.ts";
+import { numberOfPossiblePositions, takeManySteps, takeStep } from "./day21.ts";
 import { HashSet } from "https://deno.land/x/rimbu@1.0.2/hashed/mod.ts";
 import { iter } from "../utils/iter.ts";
 
@@ -147,6 +147,23 @@ Deno.test("Possible positions after taking six steps with open boundary conditio
     assertEquals(
       takeManySteps(steps, EXAMPLE_STARTING_POSITION, EXAMPLE_MAP, "periodic")
         .size,
+      numPossible,
+    );
+  })
+);
+
+[
+  { steps: 6, numPossible: 16 },
+  { steps: 10, numPossible: 50 },
+  { steps: 50, numPossible: 1594 },
+  { steps: 100, numPossible: 6536 },
+  { steps: 500, numPossible: 167004 },
+  { steps: 1000, numPossible: 668697 },
+  { steps: 5000, numPossible: 16733044 },
+].forEach(({ steps, numPossible }) =>
+  Deno.test(`Extrapolate ${numPossible} possible positions after ${steps} steps with periodic boundary conditions`, () => {
+    assertEquals(
+      numberOfPossiblePositions(steps, EXAMPLE_STARTING_POSITION, EXAMPLE_MAP),
       numPossible,
     );
   })
