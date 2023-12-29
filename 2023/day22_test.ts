@@ -7,6 +7,7 @@ import {
   identifyIndividuallyExpendableBricks,
   parseBricks,
   settleBricks,
+  SupportNode,
 } from "./day22.ts";
 
 const EXAMPLE_INPUT = `1,0,1~1,2,1
@@ -51,6 +52,25 @@ const SETTLED_OVERHANGING_BRICKS: Brick[] = [
   { origin: [1, 0, 4], axis: 0, extent: 3 },
 ];
 
+const EXAMPLE_GRAPH: SupportNode[] = [
+  { supportedBy: [], supports: [1] },
+  { supportedBy: [0], supports: [2, 3] },
+  { supportedBy: [1], supports: [4, 5] },
+  { supportedBy: [1], supports: [4, 5] },
+  { supportedBy: [2, 3], supports: [6] },
+  { supportedBy: [2, 3], supports: [6] },
+  { supportedBy: [4, 5], supports: [7] },
+  { supportedBy: [6], supports: [] },
+];
+
+const OVERHANGING_GRAPH: SupportNode[] = [
+  { supportedBy: [], supports: [1, 2] },
+  { supportedBy: [0], supports: [3] },
+  { supportedBy: [0], supports: [4] },
+  { supportedBy: [1], supports: [] },
+  { supportedBy: [2], supports: [] },
+];
+
 Deno.test("Bricks are parsed from example input", () => {
   assertEquals(parseBricks(EXAMPLE_INPUT), EXAMPLE_BRICKS);
 });
@@ -63,17 +83,25 @@ Deno.test("Single-cube bricks are parsed, picking an arbitrary axis", () => {
 });
 
 Deno.test("Bricks settle into their resting positions", () => {
-  assertEquals(settleBricks(EXAMPLE_BRICKS), SETTLED_EXAMPLE_BRICKS);
-  assertEquals(settleBricks(OVERHANGING_BRICKS), SETTLED_OVERHANGING_BRICKS);
+  assertEquals(settleBricks(EXAMPLE_BRICKS).stack, SETTLED_EXAMPLE_BRICKS);
+  assertEquals(
+    settleBricks(OVERHANGING_BRICKS).stack,
+    SETTLED_OVERHANGING_BRICKS,
+  );
+});
+
+Deno.test("Support graph is created", () => {
+  assertEquals(settleBricks(EXAMPLE_BRICKS).graph, EXAMPLE_GRAPH);
+  assertEquals(settleBricks(OVERHANGING_BRICKS).graph, OVERHANGING_GRAPH);
 });
 
 Deno.test("Determine indices of individually expendable bricks", () => {
   assertEquals(
-    identifyIndividuallyExpendableBricks(SETTLED_EXAMPLE_BRICKS),
-    [1, 2, 3, 4, 6],
+    identifyIndividuallyExpendableBricks(EXAMPLE_GRAPH),
+    [2, 3, 4, 5, 7],
   );
   assertEquals(
-    identifyIndividuallyExpendableBricks(SETTLED_OVERHANGING_BRICKS),
-    [2, 3],
+    identifyIndividuallyExpendableBricks(OVERHANGING_GRAPH),
+    [3, 4],
   );
 });
