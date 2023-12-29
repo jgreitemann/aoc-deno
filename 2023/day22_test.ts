@@ -5,6 +5,7 @@ import {
 import {
   Brick,
   identifyIndividuallyExpendableBricks,
+  numbersOfFallingBricks,
   parseBricks,
   settleBricks,
   SupportNode,
@@ -103,5 +104,16 @@ Deno.test("Determine indices of individually expendable bricks", () => {
   assertEquals(
     identifyIndividuallyExpendableBricks(OVERHANGING_GRAPH),
     [3, 4],
+  );
+});
+
+Deno.test("For each brick, determine number of falling bricks if that brick was disintegrated", () => {
+  assertEquals(
+    numbersOfFallingBricks(EXAMPLE_GRAPH),
+    [6, 0, 0, 0, 0, 1, 0],
+  );
+  assertEquals(
+    numbersOfFallingBricks(OVERHANGING_GRAPH),
+    [1, 1, 0, 0],
   );
 });

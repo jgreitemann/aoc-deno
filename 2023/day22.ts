@@ -1,12 +1,17 @@
 import { Solution } from "../solution.ts";
-import { Iter, iter, range } from "../utils/iter.ts";
+import { Iter, iter, range, sum } from "../utils/iter.ts";
 import { Point, Vector, vectorSub } from "../utils/vec.ts";
 
-export default <Solution<Brick[]>> {
-  parse: parseBricks,
-  part1(bricks: Brick[]): number {
-    const { graph } = settleBricks(bricks);
+export default <Solution<SupportNode[]>> {
+  parse(input: string): SupportNode[] {
+    const { graph } = settleBricks(parseBricks(input));
+    return graph;
+  },
+  part1(graph: SupportNode[]): number {
     return identifyIndividuallyExpendableBricks(graph).length;
+  },
+  part2(graph: SupportNode[]): number {
+    return sum(numbersOfFallingBricks(graph));
   },
 };
 
@@ -130,4 +135,32 @@ export function identifyIndividuallyExpendableBricks(
       }
     })
     .collect();
+}
+
+export function numbersOfFallingBricks(graph: SupportNode[]): number[] {
+  return graph
+    .slice(1)
+    .map(({ supports }, index) => {
+      const falling = [index + 1];
+      let supported = supports;
+
+      while (supported.length > 0) {
+        supported = supported
+          .flatMap((supportedIndex) => {
+            if (
+              graph[supportedIndex].supportedBy
+                .every((support) => falling.includes(support))
+            ) {
+              falling.push(supportedIndex);
+              return graph[supportedIndex].supports;
+            } else {
+              return [];
+            }
+          });
+      }
+
+      falling.sort();
+
+      return iter(falling).dedup().count() - 1;
+    });
 }
